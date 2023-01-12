@@ -1,3 +1,3 @@
-#base /sps
-#/bookmarks
+# base /sps
+# /bookmarks
 ## del.icio.us page

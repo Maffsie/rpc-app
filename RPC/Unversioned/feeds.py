@@ -1,9 +1,9 @@
-#base /feeds
-#/fixers/bcb
+# base /feeds
+# /fixers/bcb
 ## returns fixed rss feed for bittersweet candy bowl
 ## js: msg.payload=msg.payload.replace(/&rsquo;/g,'&amp;rsquo;');
 
-#/macalope
+# /macalope
 ## returns rss feed for the macalope
 ## get https://www.macworld.com/feed
 ## transform from xml

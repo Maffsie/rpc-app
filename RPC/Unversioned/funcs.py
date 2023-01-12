@@ -7,6 +7,7 @@ functions = Blueprint("funcs", __name__, url_prefix="/functions")
 def last_sms():
     return "no"
 
-@functions.route("/voip/sms", methods=["POST","PUT"])
+
+@functions.route("/voip/sms", methods=["POST", "PUT"])
 def new_sms():
     return "no"
