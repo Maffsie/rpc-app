@@ -19,7 +19,10 @@ clean:
 requirements.dev:
 	pip --require-virtualenv install -Ur $@
 
-requirements:
+.PHONY: requirements
+requirements: requirements.txt
+
+requirements.txt:
 	pip --require-virtualenv install -Ur $@
 
 $(BUILDPATH)/requirements.txt:
