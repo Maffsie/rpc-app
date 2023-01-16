@@ -9,6 +9,6 @@ COPY . /app/
 RUN python -m venv /app/venv && \
     . /app/venv/bin/activate && \
     cd /app && \
-    make requirements.txt
+    make requirements
 
 CMD [ ".", "/app/venv/bin/activate", "&&", "gunicorn", "--chdir", "/app", "--worker-tmp-dir", "/dev/shm", "--config", "gunicorn_config.py", "RPC" ]
