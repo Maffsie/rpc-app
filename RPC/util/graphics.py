@@ -20,6 +20,7 @@ def wrap_text(
     for word in words:
         if len(word) > 20:
             lines[-1] = "word too long"
+        else:
             if curr_line_width == 0:
                 word_width = font.getlength(word, direction)
                 #if word_width > max_width:
