@@ -1,0 +1,6 @@
+name: RPC
+services:
+- name: web
+  github:
+    repo: maffsie/rpc-app
+    branch: main
