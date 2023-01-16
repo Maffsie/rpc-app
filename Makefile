@@ -1,6 +1,11 @@
 SRCPATH := RPC
 BUILDPATH := build
 
+DOCKER_TAG := maffsie/rpc
+GITEA_TAG := commit.pup.cloud/maff/rpc
+
+EXPOSE_PORT ?= 8069
+
 .PHONY: help
 help:
 	@echo build-path clean requirements.dev requirements $(BUILDPATH)/requirements.txt package format lint unit-test
@@ -26,6 +31,17 @@ requirements:
 .PHONY: novenv-requirements
 novenv-requirements:
 	pip install -Ur requirements
+
+.PHONY: docker-build
+docker-build:
+	@docker build -t $(DOCKER_TAG):latest -t $(GITEA_TAG):latest .
+.PHONY: docker-push
+docker-push:
+	@docker push -a $(DOCKER_TAG)
+	@docker push -a $(GITEA_TAG)
+
+.PHONY: docker
+docker: docker-build docker-push
 
 $(BUILDPATH)/requirements.txt:
 	pip --require-virtualenv freeze \
@@ -70,3 +86,7 @@ ci-test: build-path requirements.dev requirements
 .PHONY: local-run
 local-run: requirements
 	flask -A $(SRCPATH) run
+
+.PHONY: local-run-docker
+local-run-docker: docker-build
+	@docker run --rm -it -p $(EXPOSE_PORT):8080 $(DOCKER_TAG):latest
