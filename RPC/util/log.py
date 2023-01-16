@@ -1,6 +1,9 @@
 from enum import Enum
+from typing import Union
 from uuid import UUID
 from uuid import uuid1 as uuid
+
+from .coercion import coerce_type
 
 
 class LogLevel(Enum):
@@ -22,8 +25,11 @@ class LogLevel(Enum):
 
 
 class Logger:
-    def __init__(self, correlation_id: UUID = None):
+    _debug: bool = False
+
+    def __init__(self, correlation_id: Union[UUID, None] = None, debug: bool = False):
         self.cid = correlation_id if correlation_id is not None else uuid()
+        self._debug = debug
 
     def write(self, level: LogLevel, msg: str, *args, **kwargs):
         """
@@ -32,8 +38,8 @@ class Logger:
         from the main correlation ID.
         """
         if not isinstance(level, LogLevel):
-            level = self.coerce_type(level, LogLevel)
-        if level == LogLevel.DEBUG and not self.config["debug"]:
+            level = coerce_type(level, LogLevel)
+        if level == LogLevel.DEBUG and not self._debug:
             return
         this_cid = uuid(self.cid.node)
         print(f"{self.cid} {level.name}: {msg}")

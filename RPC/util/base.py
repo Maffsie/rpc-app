@@ -1,6 +1,6 @@
 from os import environ as env
+from typing import Union
 from uuid import UUID
-from uuid import uuid1 as uuid
 
 from .coercion import coerce_type
 from .conf import preconfigure
@@ -18,7 +18,7 @@ class Base:
         "NDEBUGSET": "Debug logging is enabled.",
     }
 
-    def __init__(self, correlation_id: UUID = None):
+    def __init__(self, correlation_id: Union[UUID, None] = None):
         self.log = Logger(correlation_id=correlation_id)
         preconfigure()
         self.load_conf()

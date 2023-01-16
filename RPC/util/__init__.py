@@ -1,4 +1,6 @@
 from .base import Base
 from .coercion import coerce_type
 from .conf import preconfigure
+from .decorators import couldError
+from .graphics import fit_text, render_rdj
 from .log import Logger, LogLevel

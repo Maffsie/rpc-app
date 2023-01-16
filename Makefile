@@ -13,8 +13,8 @@ build-path:
 clean:
 	rm -rf $(BUILDPATH)
 	find . -name '*.pyc' -delete
-	find . -type d -name __pycache__ -delete
-	find . -type d -name .pytest_cache -delete
+	find . -type d -name __pycache__ -exec rm -rf {} +
+	find . -type d -name .pytest_cache -exec rm -rf {} +
 
 requirements.dev:
 	pip --require-virtualenv install -Ur $@
@@ -54,9 +54,13 @@ lint: build-path requirements.dev
 	black --check $(SRCPATH) | tee $(BUILDPATH)/black-lint.log
 	flake8 $(SRCPATH) | tee $(BUILDPATH)/flake8-lint.log
 
-.PHONY: unit-test
-unit-test: build-path requirements.dev requirements
-	python -m pytest $(SRCPATH) --cov $(ARGS) | tee $(BUILDPATH)/pytest.log
+.PHONY: test
+test: build-path requirements.dev requirements
+	python -m pytest $(SRCPATH) $(ARGS)
+
+.PHONY: ci-test
+ci-test: build-path requirements.dev requirements
+	python -m pytest $(SRCPATH) $(ARGS) | tee $(BUILDPATH)/pytest.log
 
 .PHONY: local-run
 local-run: requirements
