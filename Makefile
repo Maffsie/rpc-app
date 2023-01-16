@@ -23,6 +23,10 @@ requirements.dev:
 requirements:
 	pip --require-virtualenv install -Ur $@
 
+.PHONY: novenv-requirements
+novenv-requirements:
+	pip install -Ur requirements
+
 $(BUILDPATH)/requirements.txt:
 	pip --require-virtualenv freeze \
 		--exclude black \
