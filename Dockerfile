@@ -5,7 +5,7 @@ RUN apk add -t build-deps alpine-sdk make && \
 
 COPY . /app/
 WORKDIR /app
-RUN make requirements && \
+RUN make novenv-requirements && \
     apk del build-deps
 
 CMD [ "gunicorn", "--chdir", "/app", "--config", "gunicorn_config.py", "RPC" ]
