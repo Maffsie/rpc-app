@@ -18,38 +18,40 @@ def wrap_text(
     curr_line_width = 0
 
     for word in words:
-        if curr_line_width == 0:
-            word_width = font.getlength(word, direction)
-            if word_width > max_width:
-                while True:
-                    for ch in range(len(word), 1, -1):
-                        if font.getlength(word[0:ch], direction) <= max_width:
-                            lines.append(word[0:ch])
-                            word = word.partition(word[0:ch])[2]
-                            break
-                    match len(word):
-                        case 0:
-                            break
-                        case 1:
-                            lines.append(word)
-                            break
-
-            lines[-1] = word
-            curr_line_width = word_width
-        else:
-            new_line_width = font.getlength(f"{lines[-1]} {word}", direction)
-
-            if new_line_width > max_width:
-                # Word is too long to fit on the current line
+        if len(word) > 20:
+            lines[-1] = "word too long"
+            if curr_line_width == 0:
                 word_width = font.getlength(word, direction)
+                #if word_width > max_width:
+                    #while True:
+                    #    for ch in range(len(word), 1, -1):
+                    #        if font.getlength(word[0:ch], direction) <= max_width:
+                    #            lines.append(word[0:ch])
+                    #            word = word.partition(word[0:ch])[2]
+                    #            break
+                    #    match len(word):
+                    #        case 0:
+                    #            break
+                    #        case 1:
+                    #            lines.append(word)
+                    #            break
 
-                # Put the word on the next line
-                lines.append(word)
+                lines[-1] = word
                 curr_line_width = word_width
             else:
-                # Put the word on the current line
-                lines[-1] = f"{lines[-1]} {word}"
-                curr_line_width = new_line_width
+                new_line_width = font.getlength(f"{lines[-1]} {word}", direction)
+
+                if new_line_width > max_width:
+                    # Word is too long to fit on the current line
+                    word_width = font.getlength(word, direction)
+
+                    # Put the word on the next line
+                    lines.append(word)
+                    curr_line_width = word_width
+                else:
+                    # Put the word on the current line
+                    lines[-1] = f"{lines[-1]} {word}"
+                    curr_line_width = new_line_width
 
     return "\n".join(lines)
 
