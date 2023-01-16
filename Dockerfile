@@ -8,4 +8,4 @@ WORKDIR /app
 RUN make novenv-requirements && \
     apk del build-deps
 
-CMD [ "gunicorn", "--chdir", "/app", "--config", "gunicorn_config.py", "RPC" ]
+CMD [ "gunicorn", "--chdir", "/app", "--config", "gunicorn_config.py", "RPC:create_app()" ]
