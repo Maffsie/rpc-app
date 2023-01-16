@@ -1,4 +1,4 @@
-name: RPC
+name: rpc
 services:
 - name: web
   github:

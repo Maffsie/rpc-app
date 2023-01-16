@@ -1,5 +1,5 @@
 spec:
-  name: RPC
+  name: rpc
   services:
   - name: web
     git:
