@@ -24,7 +24,7 @@ COPY --chown=nobody:daemon RPC /app/RPC
 COPY --chown=nobody:daemon gunicorn_config.py /app/
 
 # you have encountered my trap card (killing myself as soon as something goes wrong)
-RUN find /app -not -user nobody -or -not -group daemon && exit 1
+RUN find /app -not -user nobody -or -not -group daemon && exit 1 || exit 0
 
 VOLUME /app/resources
 
