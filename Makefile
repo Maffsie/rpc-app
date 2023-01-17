@@ -1,5 +1,6 @@
 SRCPATH := RPC
 BUILDPATH := build
+RESPATH := resources
 
 DOCKER_TAG := maffsie/rpc
 GITEA_TAG := commit.pup.cloud/maff/rpc
@@ -27,11 +28,9 @@ clean:
 
 requirements.dev: requirements
 	pipenv install --dev
-	#pip --require-virtualenv install -Ur $@
 
 requirements:
 	pipenv install
-	#pip --require-virtualenv install -Ur $@
 
 docker-build:
 	@docker build -t $(DOCKER_TAG):latest -t $(GITEA_TAG):latest .
@@ -60,11 +59,15 @@ test: build-path requirements requirements.dev
 ci-test: build-path requirements requirements.dev
 	python -m pytest $(SRCPATH) $(ARGS) | tee $(BUILDPATH)/pytest.log
 
+resources:
+	[ -d $(RESPATH) ] && cp -pr resources.default/* $(RESPATH)/
+	[ -d $(RESPATH) ] || cp -pr resources.default $(RESPATH)
+
 flask-run: requirements banner
 	flask -A $(SRCPATH) run
 
 gunicorn-run: banner
-	gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
+	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 docker-run: docker-build
 	@docker run --rm -it -p $(EXPOSE_PORT):8080 $(DOCKER_TAG):latest
