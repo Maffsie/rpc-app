@@ -4,7 +4,7 @@ FROM python:3.11-alpine
 #  will that stop me? absolutely not.
 RUN apk add -t runtime-deps make && \
     mkdir /app && \
-    chown -R nobody:daemon /app \
+    chown -R nobody:daemon /app
 
 RUN pip install -U pipenv
 
