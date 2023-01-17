@@ -60,10 +60,10 @@ test: build-path requirements requirements.dev
 ci-test: build-path requirements requirements.dev
 	python -m pytest $(SRCPATH) $(ARGS) | tee $(BUILDPATH)/pytest.log
 
-flask-run: requirements
+flask-run: requirements banner
 	flask -A $(SRCPATH) run
 
-gunicorn-run:
+gunicorn-run: banner
 	gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 docker-run: docker-build
@@ -80,5 +80,4 @@ banner:
 	@echo "┬ ┬┌─┐┬ ┬  ┬  ┌─┐┌┬┐  ┌─┐  ┌─┐┬ ┬┌─┐┌─┐┬ ┬  ┬─┐┬ ┬┌┐┌  ┬ ┬┌─┐┬ ┬┬─┐  ┌─┐┌─┐┬┌─┐"
 	@echo "└┬┘│ ││ │  │  ├┤  │   ├─┤  ├─┘│ │├─┘├─┘└┬┘  ├┬┘│ ││││  └┬┘│ ││ │├┬┘  ├─┤├─┘│ ┌┘"
 	@echo " ┴ └─┘└─┘  ┴─┘└─┘ ┴   ┴ ┴  ┴  └─┘┴  ┴   ┴   ┴└─└─┘┘└┘   ┴ └─┘└─┘┴└─  ┴ ┴┴  ┴ o "
-
-
+	@echo
