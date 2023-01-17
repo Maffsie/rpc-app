@@ -1,0 +1,2 @@
+export BASE_URI=rpc.puppy.network
+export DEBUG=yeah

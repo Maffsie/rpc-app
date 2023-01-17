@@ -18,6 +18,7 @@ TRUEABLE_WORDS = [
     "approved",
     "comply",
     "consent",
+    "cool",
     "enable",
     "enabled",
     "e",
@@ -28,7 +29,8 @@ TRUEABLE_WORDS = [
     "permit",
     "true",
     "tru",
-    "t" "yeah",
+    "t",
+    "yeah",
     "yes",
     "y",
 ]

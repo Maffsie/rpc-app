@@ -23,19 +23,19 @@ def wrap_text(
         else:
             if curr_line_width == 0:
                 word_width = font.getlength(word, direction)
-                #if word_width > max_width:
-                    #while True:
-                    #    for ch in range(len(word), 1, -1):
-                    #        if font.getlength(word[0:ch], direction) <= max_width:
-                    #            lines.append(word[0:ch])
-                    #            word = word.partition(word[0:ch])[2]
-                    #            break
-                    #    match len(word):
-                    #        case 0:
-                    #            break
-                    #        case 1:
-                    #            lines.append(word)
-                    #            break
+                # if word_width > max_width:
+                # while True:
+                #    for ch in range(len(word), 1, -1):
+                #        if font.getlength(word[0:ch], direction) <= max_width:
+                #            lines.append(word[0:ch])
+                #            word = word.partition(word[0:ch])[2]
+                #            break
+                #    match len(word):
+                #        case 0:
+                #            break
+                #        case 1:
+                #            lines.append(word)
+                #            break
 
                 lines[-1] = word
                 curr_line_width = word_width

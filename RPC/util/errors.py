@@ -1,5 +1,4 @@
 from inspect import getmro
-from typing import List
 
 
 class RPCException(Exception):
@@ -23,6 +22,11 @@ class RPCInputException(RPCException):
     extype = "Input exception"
 
 
+class RPCAuthException(RPCInputException):
+    extype = "Authentication exception"
+    hstatus = 403
+
+
 class RPCOperationalException(RPCException):
     extype = "Internal/operational exception"
 
@@ -42,3 +46,23 @@ class InvalidInputError(RPCInputException):
 
 class ImageGenerationError(RPCOperationalException):
     extype = "Operational error while generating image"
+
+
+class AuthRequiredError(RPCAuthException):
+    extype = "Endpoint requires authentication"
+    hstatus = 401
+
+
+class AuthExpiredError(RPCAuthException):
+    extype = "Authentication token expired"
+    hstatus = 401
+
+
+class AuthInvalidError(RPCAuthException):
+    extype = "Authentication credentials are invalid"
+    hstatus = 403
+
+
+class AuthInsufficientError(RPCAuthException):
+    extype = "Endpoint requires a permission you do not have"
+    hstatus = 403

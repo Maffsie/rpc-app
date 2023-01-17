@@ -1,8 +1,8 @@
-from flask import Flask
+from .app import RPCApp
 
 
 def create_app():
-    app = Flask(__name__)
+    app = RPCApp(__name__)
 
     from RPC.Unversioned import unversioned_api
     from RPC.v1 import v1_api

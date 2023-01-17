@@ -18,10 +18,11 @@ def preconfigure(
         "/run/secrets",
     ],
 ):
+    print("preconfigure")
     # No need to error-check this, dotenv handles it fine
-    [loadenv(dotenv_path=fp) for fp in conf_file]
+    [loadenv(dotenv_path=fp, verbose=True) for fp in conf_file]
     # Need to error-check this
     try:
-        [[loadenv(dotenv_path=f"{p}/{fn}") for fn in listdir(p)] for p in conf_paths]
+        [[loadenv(dotenv_path=f"{p}/{fn}", verbose=True) for fn in listdir(p)] for p in conf_paths]
     except FileNotFoundError:
         pass
