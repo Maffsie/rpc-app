@@ -3,8 +3,7 @@ FROM python:3.11-alpine
 # Is it psychopathic to use make for everything? probably
 #  will that stop me? absolutely not.
 RUN apk add -t runtime-deps make && \
-    mkdir /app && \
-    chown -R nobody:daemon /app
+    mkdir /app
 
 RUN pip install -U pipenv
 
@@ -20,8 +19,10 @@ RUN mkdir /app/.venv && \
     make requirements
 
 COPY resources /app/resources.default
-COPY RPC /app/
+COPY RPC /app/RPC
 COPY gunicorn_config.py /app/
+
+RUN chown -R nobody:daemon /app
 
 VOLUME /app/resources
 

@@ -66,7 +66,7 @@ resources:
 flask-run: requirements banner
 	flask -A $(SRCPATH) run
 
-gunicorn-run: banner
+gunicorn-run: resources banner
 	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 docker-run: docker-build
