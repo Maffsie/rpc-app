@@ -1,11 +1,15 @@
 FROM python:3.11-alpine
 
-RUN apk add -t build-deps alpine-sdk make && \
-    mkdir /app
+# Is it psychopathic to use make for everything? probably
+#  will that stop me? absolutely not.
+RUN apk add -t runtime-deps make && \
+    mkdir /app && \
+    pip install -U pipenv
 
 COPY . /app/
 WORKDIR /app
-RUN make novenv-requirements && \
-    apk del build-deps
 
-CMD [ "gunicorn", "--chdir", "/app", "--config", "gunicorn_config.py", "RPC:create_app()" ]
+RUN mkdir /app/.venv && \
+    make requirements
+
+CMD [ "make", "gunicorn-run" ]

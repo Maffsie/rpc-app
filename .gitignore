@@ -1,7 +1,16 @@
-build/
 venv/
+.venv/
 
-*.pyc
+.idea/
+.vscode/
+
+build/
+
 __pycache__/
 .pytest_cache/
-.vscode/
+
+.env
+env
+*.pyc
+
+Pipfile.lock
