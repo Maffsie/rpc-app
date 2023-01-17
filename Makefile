@@ -29,7 +29,7 @@ requirements.dev: requirements
 	pipenv install --dev
 	#pip --require-virtualenv install -Ur $@
 
-requirements: exp
+requirements:
 	pipenv install
 	#pip --require-virtualenv install -Ur $@
 
