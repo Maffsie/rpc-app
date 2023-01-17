@@ -12,18 +12,19 @@ USER nobody:daemon
 
 WORKDIR /app
 
-COPY Pipfile /app/
-COPY requirements /app/
-COPY Makefile /app/
+COPY --chown=nobody:daemon Pipfile /app/
+COPY --chown=nobody:daemon requirements /app/
+COPY --chown=nobody:daemon Makefile /app/
 
 RUN mkdir /app/.venv && \
     make requirements
 
-COPY resources /app/resources.default
-COPY RPC /app/RPC
-COPY gunicorn_config.py /app/
+COPY --chown=nobody:daemon resources /app/resources.default
+COPY --chown=nobody:daemon RPC /app/RPC
+COPY --chown=nobody:daemon gunicorn_config.py /app/
 
-RUN chown -R nobody:daemon /app
+# you have encountered my trap card (killing myself as soon as something goes wrong)
+RUN find /app -not -user nobody -or -not -group daemon && exit 1
 
 VOLUME /app/resources
 
