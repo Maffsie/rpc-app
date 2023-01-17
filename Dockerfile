@@ -7,6 +7,7 @@ RUN apk add -t runtime-deps make && \
 
 RUN pip install -U pipenv
 
+RUN chown -R nobody:daemon /app
 USER nobody:daemon
 
 WORKDIR /app
