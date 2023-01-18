@@ -37,6 +37,8 @@ EXPOSE_PORT ?= 8069
 .PHONY: format lint test ci-test
 #code-running
 .PHONY: flask-run gunicorn-run
+#operational checks
+.PHONY: healthcheck
 #container-only
 .PHONY: docker-build docker-push docker-run docker
 #misc. tasks
@@ -118,6 +120,9 @@ flask-run: requirements $(RESTGTS) banner
 # Starts the gunicorn production server
 gunicorn-run: requirements $(RESTGTS) banner
 	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
+
+healthcheck:
+	$(ENVBIN) curl -s http://127.0.0.1/v1/healthy
 
 # Outputs a fun lil banner.
 banner:
