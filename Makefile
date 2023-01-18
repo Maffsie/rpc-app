@@ -11,7 +11,7 @@ RESPATH := resources
 VENVPATH := .venv
 
 # Resources managed by Make
-RESTGTS := $(shell find $(RESDPATH) -maxdepth 1 -mindepth 1 -not -name '.*' -exec basename {} \;|sed 's/^/$(RESPATH)\//g')
+RESTGTS := $(shell $(ENVBIN) find $(RESDPATH) -maxdepth 1 -mindepth 1 -not -name '.*' -exec $(ENVBIN) basename {} \;|$(ENVBIN) sed 's/^/$(RESPATH)\//g')
 
 # Operational stuff
 GITREPO := https://github.com/Maffsie/rpc-app.git
@@ -72,16 +72,16 @@ requirements: .venv
 
 # Build the docker container and ensure it's tagged with the necessary tags
 docker-build:
-	@docker build -t $(DOCKER_TAG):latest -t $(GITEA_TAG):latest .
+	@$(ENVBIN) docker build -t $(DOCKER_TAG):latest -t $(GITEA_TAG):latest .
 
 # Push the built container up to all tagged repos, ensuring a fresh build first
 docker-push: docker-build
-	@docker push -a $(DOCKER_TAG)
-	@docker push -a $(GITEA_TAG)
+	@$(ENVBIN) docker push -a $(DOCKER_TAG)
+	@$(ENVBIN) docker push -a $(GITEA_TAG)
 
 # Run the built container with the API exposed on the configured port, ensuring a fresh build first
 docker-run: docker-build
-	@docker run --rm -it -p $(EXPOSE_PORT):8080 $(DOCKER_TAG):latest
+	@$(ENVBIN) docker run --rm -it -p $(EXPOSE_PORT):8080 $(DOCKER_TAG):latest
 
 # Run automatic code formatting tools
 format: requirements.dev
@@ -109,7 +109,7 @@ resources:
 # Copies all files and directories within the default resources into the resources folder
 # for supporting Docker volumes
 $(RESTGTS): resources
-	cp -pr $(RESDPATH)/$(shell basename $@) $@
+	cp -pr $(RESDPATH)/$(shell $(ENVBIN) basename $@) $@
 
 # Starts the Flask development server
 flask-run: requirements $(RESTGTS) banner
