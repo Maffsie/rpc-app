@@ -42,7 +42,12 @@ EXPOSE_PORT ?= 8069
 #container-only
 .PHONY: docker-build docker-push docker-run docker
 #misc. tasks
+##git workflow
+.PHONY: gitcommit gitpull gitpush
+##build and deployment - arm64
 .PHONY: arm64build arm64deploy
+##dev helping
+.PHONY: localtest
 
 # Help text
 help: banner
@@ -122,7 +127,7 @@ gunicorn-run: requirements $(RESTGTS) banner
 	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 healthcheck:
-	$(ENVBIN) curl -s http://127.0.0.1/v1/health/alive
+	$(ENVBIN) curl -s http://127.0.0.1:8080/v1/health/alive
 
 # Outputs a fun lil banner.
 banner:
@@ -141,6 +146,12 @@ banner:
 gitpull:
 	git pull
 
+gitcommit:
+	git commit -p
+
+gitpush:
+	git push
+
 arm64build:
 	ssh $(ARM64USR)@$(ARM64HOST) git clone $(GITREPO) /tmp/a64rpc
 	ssh $(ARM64USR)@$(ARM64HOST) make -C /tmp/a64rpc docker-push
@@ -148,3 +159,5 @@ arm64build:
 
 arm64deploy:
 	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest $(SWARM_SVC)
+
+localtest: gitcommit gitpush arm64build arm64deploy
