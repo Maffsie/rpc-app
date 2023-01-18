@@ -122,7 +122,7 @@ gunicorn-run: requirements $(RESTGTS) banner
 	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 healthcheck:
-	$(ENVBIN) curl -s http://127.0.0.1/v1/healthy
+	$(ENVBIN) curl -s http://127.0.0.1/v1/health/alive
 
 # Outputs a fun lil banner.
 banner:
