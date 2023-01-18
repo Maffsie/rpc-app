@@ -2,7 +2,10 @@ FROM python:3.11-alpine
 
 # Is it psychopathic to use make for everything? probably
 #  will that stop me? absolutely not.
-RUN apk add -t runtime-deps make && \
+RUN apk add -t runtime-deps \
+      make && \
+    apk add -t healthcheck-deps \
+      curl && \
     mkdir -p /app/resources
 
 RUN pip install -U pipenv
