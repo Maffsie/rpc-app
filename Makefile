@@ -2,6 +2,9 @@
 SRCPATH := RPC
 RESDPATH := resources.default
 
+# Toolpaths
+ENVBIN := /usr/bin/env
+
 # Paths managed by Make
 BUILDPATH := build
 RESPATH := resources
@@ -110,7 +113,7 @@ $(RESTGTS): resources
 
 # Starts the Flask development server
 flask-run: requirements $(RESTGTS) banner
-	flask -A $(SRCPATH) run
+	pipenv run flask -A $(SRCPATH) run
 
 # Starts the gunicorn production server
 gunicorn-run: requirements $(RESTGTS) banner
@@ -134,7 +137,9 @@ gitpull:
 	git pull
 
 arm64build:
-	ssh $(ARM64USR)@$(ARM64HOST) sh -c 'cd `mktemp -d` && git clone $(GITREPO) . && make docker-push'
+	ssh $(ARM64USR)@$(ARM64HOST) git clone $(GITREPO) /tmp/a64rpc
+	ssh $(ARM64USR)@$(ARM64HOST) make -C /tmp/a64rpc docker-push
+	ssh $(ARM64USR)@$(ARM64HOST) rm -rf /tmp/a64rpc
 
 arm64deploy:
 	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest $(SWARM_SVC)
