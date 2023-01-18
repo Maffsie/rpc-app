@@ -5,9 +5,9 @@ name = "pypi"
 
 [packages]
 flask = "*"
+gunicorn = "*"
 pillow = "*"
 python-dotenv = "*"
-gunicorn = "*"
 
 [dev-packages]
 black = "*"

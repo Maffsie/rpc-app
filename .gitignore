@@ -5,12 +5,14 @@ venv/
 .vscode/
 
 build/
+resources/
 
 __pycache__/
 .pytest_cache/
 
 .env
 env
+
 *.pyc
 
 Pipfile.lock

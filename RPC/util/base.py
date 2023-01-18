@@ -17,16 +17,16 @@ class Base:
     errdes = {
         "NDEBUGSET": "Debug logging is enabled.",
     }
-    init=0
+    init = 0
 
     def __init__(self, correlation_id: Union[UUID, None] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.init=1
+        self.init = 1
         self.log = Logger(correlation_id=correlation_id)
         preconfigure()
         self.load_conf()
-        self.log._debug = self.app_config.get('debug')
-        self.init=2
+        self.log._debug = self.app_config.get("debug")
+        self.init = 2
 
     def load_conf(self):
         """
@@ -59,4 +59,6 @@ class Base:
             return value
 
         for entry in self.app_config:
-            self.app_config[entry] = load_conf_one(entry.upper(), self.app_config[entry])
+            self.app_config[entry] = load_conf_one(
+                entry.upper(), self.app_config[entry]
+            )

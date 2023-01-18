@@ -1,6 +1,10 @@
 SRCPATH := RPC
 BUILDPATH := build
+RESDPATH := resources.default
 RESPATH := resources
+VENVPATH := .venv
+
+RESTGTS := $(shell find $(RESDPATH) -maxdepth 1 -mindepth 1 -not -name '.*' -printf '%P\n')
 
 DOCKER_TAG := maffsie/rpc
 GITEA_TAG := commit.pup.cloud/maff/rpc
@@ -12,14 +16,13 @@ PIPENV_IGNORE_VIRTUALENVS := 1
 .PHONY: help build-path banner clean requirements requirements.dev docker docker-build
 .PHONY: docker-push docker-run flask-run gunicorn-run format lint ci-test test package
 
-help:
-	@echo build-path clean requirements.dev requirements $(BUILDPATH)/requirements.txt package format lint unit-test
+help: banner
+	@echo yeah i could use some help lol
 
 build-path:
 	mkdir -p $(BUILDPATH)
 
 clean:
-	pipenv clean
 	pipenv --rm
 	rm -rf $(BUILDPATH)
 	find . -name '*.pyc' -delete
@@ -29,8 +32,11 @@ clean:
 requirements.dev: requirements
 	pipenv install --dev
 
-requirements:
+requirements: .venv
 	pipenv install
+
+.venv:
+	mkdir $(VENVPATH)
 
 docker-build:
 	@docker build -t $(DOCKER_TAG):latest -t $(GITEA_TAG):latest .
@@ -60,13 +66,17 @@ ci-test: build-path requirements requirements.dev
 	python -m pytest $(SRCPATH) $(ARGS) | tee $(BUILDPATH)/pytest.log
 
 resources:
-	[ -d $(RESPATH) ] && cp -pr resources.default/* $(RESPATH)/
-	[ -d $(RESPATH) ] || cp -pr resources.default $(RESPATH)
+	mkdir $(RESPATH)
+
+$(RESTGTS): resources
+	cp -pr $@ $(RESPATH)
+
+all-resources: $(RESTGTS)
 
 flask-run: requirements banner
 	flask -A $(SRCPATH) run
 
-gunicorn-run: resources banner
+gunicorn-run: requirements resources banner
 	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 docker-run: docker-build

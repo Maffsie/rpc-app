@@ -10,6 +10,3 @@ def create_app():
     [rpc.register_blueprint(b) for b in (unversioned_api, v1_api)]
 
     return rpc
-
-def application(*args, **kwargs):
-    return create_app()
