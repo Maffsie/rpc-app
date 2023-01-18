@@ -12,13 +12,13 @@ USER nobody:daemon
 
 WORKDIR /app
 
+COPY --chown=nobody:daemon Makefile /app/
+COPY --chown=nobody:daemon resources.default /app/resources.default
+
 COPY --chown=nobody:daemon Pipfile /app/
 COPY --chown=nobody:daemon requirements /app/
-COPY --chown=nobody:daemon Makefile /app/
-
 RUN make requirements
 
-COPY --chown=nobody:daemon resources.default /app/resources.default
 COPY --chown=nobody:daemon RPC /app/RPC
 COPY --chown=nobody:daemon gunicorn_config.py /app/
 
