@@ -1,14 +1,15 @@
-from flask import Blueprint, current_app
-
-from RPC.util.response import jsonreply
+from flask import Blueprint, current_app, jsonify
 
 health = Blueprint("health", __name__, url_prefix="/health")
 
 
 @health.route("/alive")
 def heartbeat_check():
-    return jsonreply(
-        {
-            "status": "alive!",
-        }
+    return (
+        jsonify(
+            {
+                "status": "alive!",
+            }
+        ),
+        200,
     )
