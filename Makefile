@@ -127,7 +127,8 @@ gunicorn-run: requirements $(RESTGTS) banner
 	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 healthcheck:
-	$(ENVBIN) curl -s http://127.0.0.1:8080/v1/health/alive
+	$(ENVBIN) curl -s http://127.0.0.1:8080/ping | $(ENVBIN) grep 'pong'
+	$(ENVBIN) curl -s http://127.0.0.1:8080/v1/health/alive | $(ENVBIN) grep 'alive!'
 
 # Outputs a fun lil banner.
 banner:
