@@ -160,4 +160,4 @@ arm64build:
 arm64deploy:
 	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest $(SWARM_SVC)
 
-localtest: gitcommit gitpush arm64build arm64deploy
+localtest: format gitcommit gitpush arm64build arm64deploy
