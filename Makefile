@@ -119,11 +119,14 @@ $(RESTGTS): resources
 	cp -pr $(RESDPATH)/$(shell $(ENVBIN) basename $@) $@
 
 # Starts the Flask development server
+#  Depends on requirements because you'd normally run this during dev, where requirements
+#   are being changed
 flask-run: requirements $(RESTGTS) banner
 	pipenv run flask -A $(SRCPATH) run
 
 # Starts the gunicorn production server
-gunicorn-run: requirements $(RESTGTS) banner
+#  Does not depend on requirements, because this would be run in a packaged scenario
+gunicorn-run: $(RESTGTS) banner
 	pipenv run gunicorn --config gunicorn_config.py "$(SRCPATH):create_app()"
 
 healthcheck:
@@ -143,6 +146,8 @@ banner:
 	@echo "└┬┘│ ││ │  │  ├┤  │   ├─┤  ├─┘│ │├─┘├─┘└┬┘  ├┬┘│ ││││  └┬┘│ ││ │├┬┘  ├─┤├─┘│ ┌┘"
 	@echo " ┴ └─┘└─┘  ┴─┘└─┘ ┴   ┴ ┴  ┴  └─┘┴  ┴   ┴   ┴└─└─┘┘└┘   ┴ └─┘└─┘┴└─  ┴ ┴┴  ┴ o "
 	@echo
+
+# Lazy extra targets for easy dev
 
 gitpull:
 	git pull

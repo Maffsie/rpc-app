@@ -1,18 +1,22 @@
-FROM python:3.11-alpine
+FROM python:3.11-alpine AS build
 
-# Is it psychopathic to use make for everything? probably
-#  will that stop me? absolutely not.
-RUN apk add -t runtime-deps \
-      make && \
-    apk add -t healthcheck-deps \
-      curl && \
-    mkdir -p /app/resources
+# i686 (and possibly other uncommon architectures?) require
+#  build-time dependencies.
+# Since this is split into a two-stage build now, don't need
+#  to check the architecture.
+# For posterity, the architecture check was: sh -c '[ `uname -m` == "i686" ]' && ...
+RUN apk add -t build-deps \
+		alpine-sdk \
+    	make && \
+    apk add -t build-deps-py3-pillow \
+		freetype-dev \
+		jpeg-dev \
+    	zlib-dev
+RUN mkdir -p /app/resources && \
+	pip install -U pipenv && \
+	chown -R nobody:daemon /app
 
-RUN pip install -U pipenv
-
-RUN chown -R nobody:daemon /app
 USER nobody:daemon
-
 WORKDIR /app
 
 COPY --chown=nobody:daemon Makefile /app/
@@ -20,7 +24,22 @@ COPY --chown=nobody:daemon resources.default /app/resources.default
 
 COPY --chown=nobody:daemon Pipfile /app/
 COPY --chown=nobody:daemon requirements /app/
+
 RUN make requirements
+
+FROM python:3.11-alpine as release
+USER root:root
+# Is it psychopathic to use make for everything? probably
+#  will that stop me? absolutely not.
+RUN apk add -t runtime-deps \
+      make && \
+    apk add -t healthcheck-deps \
+      curl && \
+    pip install -U pipenv
+
+USER nobody:daemon
+
+COPY --from=build --chown=nobody:daemon /app /app
 
 COPY --chown=nobody:daemon RPC /app/RPC
 COPY --chown=nobody:daemon gunicorn_config.py /app/
