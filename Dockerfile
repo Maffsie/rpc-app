@@ -40,6 +40,7 @@ RUN apk add -t runtime-deps \
 USER nobody:daemon
 
 COPY --from=build --chown=nobody:daemon /app /app
+WORKDIR /app
 
 COPY --chown=nobody:daemon RPC /app/RPC
 COPY --chown=nobody:daemon gunicorn_config.py /app/
