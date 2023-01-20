@@ -5,6 +5,7 @@ from RPC.util import Base
 
 class RPCApp(Base, Flask):
     # TODO: Configuration should have SAML or OAuth2/OIDC params for authenticated requests
+    # TODO: cron_octopus stuff
     app_config = {
         "debug": False,
         "base_uri": str,
