@@ -35,7 +35,9 @@ RUN apk add -t runtime-deps \
       make && \
     apk add -t healthcheck-deps \
       curl && \
-    pip install -U pipenv
+    pip install -U pipenv && \
+    mkdir /conf && \
+    chown nobody:daemon /conf
 
 USER nobody:daemon
 
@@ -48,7 +50,7 @@ COPY --chown=nobody:daemon gunicorn_config.py /app/
 # you have encountered my trap card (killing myself as soon as something goes wrong)
 RUN sh -c '[ `find /app ! \( -user nobody -o -group daemon \) | wc -l` -eq 0 ]'
 
-VOLUME [ "/app/resources" ]
+VOLUME [ "/app/resources", "/conf" ]
 EXPOSE 8080
 HEALTHCHECK --interval=10s \
             --timeout=1s \
