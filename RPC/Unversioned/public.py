@@ -1,13 +1,14 @@
 from pathlib import Path
 
-from flask import Blueprint, request, send_file
+from flask import request, send_file
 
+from RPC.util.base import Api
 from RPC.util.coercion import coerce_type
 from RPC.util.decorators import throws
 from RPC.util.errors import ImageGenerationError, InvalidInputError, MissingFileError
 from RPC.util.graphics import render_rdj
 
-routes = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
+routes = Api()
 
 
 @routes.route("/get_last")

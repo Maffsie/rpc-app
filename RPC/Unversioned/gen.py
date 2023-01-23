@@ -1,8 +1,8 @@
 import uuid
 
-from flask import Blueprint
+from RPC.util.base import Api
 
-routes = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
+routes = Api()
 
 
 @routes.route("/uuid")

@@ -1,6 +1,8 @@
-from flask import Blueprint, current_app, jsonify
+from flask import jsonify
 
-routes = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
+from RPC.util.base import Api
+
+routes = Api()
 
 
 @routes.route("/alive")

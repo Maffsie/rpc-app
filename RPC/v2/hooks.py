@@ -1,6 +1,8 @@
-from flask import Blueprint, current_app
+from flask import current_app
 
-routes = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
+from RPC.util.base import Api
+
+routes = Api()
 
 
 @routes.route("/fritzin")
@@ -12,9 +14,3 @@ def fritzbox_s2h(*args, **kwargs):
             kwargs,
         ],
     )
-
-
-"""
-TODO
-- prometheus metrics exporter
-"""

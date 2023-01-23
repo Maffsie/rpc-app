@@ -1,6 +1,9 @@
+from inspect import getmodule, stack
 from os import environ as env
 from typing import Union
 from uuid import UUID
+
+from flask import Blueprint
 
 from .coercion import coerce_type
 from .conf import preconfigure
@@ -87,3 +90,15 @@ class Micro:
     # stub
     def __subinit__(self, *args, **kwargs):
         pass
+
+
+class Api(Blueprint):
+    def __init__(self, url_prefix: str = None, *args, **kwargs):
+        caller = stack()[1].function
+        callermod = getmodule(stack()[1]).__name__
+        if url_prefix is None or isinstance(url_prefix, str) and len(url_prefix) is 0:
+            url_prefix = f"/{caller}"
+        super().__init__(caller, callermod, *args, url_prefix=url_prefix, **kwargs)
+
+    def include(self, *args):
+        [self.register_blueprint(api) for api in args]

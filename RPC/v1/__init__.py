@@ -1,6 +1,8 @@
-from flask import Blueprint
+from RPC.util.base import Api
 
 from .health import routes as health
 
-api = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
-[api.register_blueprint(mod) for mod in (health,)]
+api = Api()
+api.include(
+    health,
+)

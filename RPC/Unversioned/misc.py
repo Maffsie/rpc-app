@@ -1,6 +1,6 @@
-from flask import Blueprint
+from RPC.util.base import Api
 
-routes = Blueprint(__name__, __name__, url_prefix="/")
+routes = Api(url_prefix="/")
 
 
 @routes.route("/ping")

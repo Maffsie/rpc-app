@@ -37,3 +37,6 @@ class RPCApp(Base, Flask):
 
     def __init__(self, appid: str):
         super().__init__(None, appid)
+
+    def include(self, *args):
+        [self.register_blueprint(api) for api in args]
