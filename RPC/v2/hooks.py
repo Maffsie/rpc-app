@@ -7,7 +7,7 @@ routes = Api(url_prefix="/")
 
 @routes.route(
     "/fritzin",
-    [
+    methods=[
         "GET",
         "POST",
     ],
