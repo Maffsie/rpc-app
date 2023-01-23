@@ -5,7 +5,13 @@ from RPC.util.base import Api
 routes = Api(url_prefix="/")
 
 
-@routes.route("/fritzin")
+@routes.route(
+    "/fritzin",
+    [
+        "GET",
+        "POST",
+    ],
+)
 def fritzbox_s2h():
     current_app.log.verbose(
         "god damn", args=request.args, method=request.method, body=request.data
