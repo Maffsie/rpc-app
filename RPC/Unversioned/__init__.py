@@ -5,5 +5,5 @@ from .gen import generators
 from .misc import simple
 from .public import botapi
 
-unversioned_api = Blueprint("unversioned", __name__, url_prefix="/")
-[unversioned_api.register_blueprint(b) for b in (functions, generators, simple, botapi)]
+api = Blueprint(__name__, __name__, url_prefix="/")
+[api.register_blueprint(mod) for mod in (functions, generators, simple, botapi)]

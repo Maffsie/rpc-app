@@ -1,6 +1,13 @@
 from flask import Blueprint
 
-from .health import health
+from .health import routes as health
+from .hooks import routes as hooks
 
-v2_api = Blueprint("v2", __name__, url_prefix="/v2")
-[v2_api.register_blueprint(api) for api in (health,)]
+api = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
+[
+    api.register_blueprint(mod)
+    for mod in (
+        health,
+        hooks,
+    )
+]

@@ -1,9 +1,9 @@
 from flask import Blueprint, current_app, jsonify
 
-health = Blueprint("health", __name__, url_prefix="/health")
+routes = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
 
 
-@health.route("/alive")
+@routes.route("/alive")
 def heartbeat_check():
     return (
         jsonify(
