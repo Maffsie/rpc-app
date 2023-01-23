@@ -1,13 +1,13 @@
-from flask import Blueprint, current_app, request
+from flask import Blueprint
 
-functions = Blueprint("funcs", __name__, url_prefix="/functions")
+routes = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
 
 
-@functions.route("/voip/sms", methods=["GET"])
+@routes.route("/voip/sms", methods=["GET"])
 def last_sms():
     return "no"
 
 
-@functions.route("/voip/sms", methods=["POST", "PUT"])
+@routes.route("/voip/sms", methods=["POST", "PUT"])
 def new_sms():
     return "no"

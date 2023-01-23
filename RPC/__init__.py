@@ -8,6 +8,13 @@ def create_app():
     from RPC.v1 import api as v1
     from RPC.v2 import api as v2
 
-    [rpc.register_blueprint(b) for b in (v0, v1, v2)]
+    [
+        rpc.register_blueprint(mod)
+        for mod in (
+            v0,
+            v1,
+            v2,
+        )
+    ]
 
     return rpc

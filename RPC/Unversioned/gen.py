@@ -1,11 +1,11 @@
 import uuid
 
-from flask import Blueprint, current_app
+from flask import Blueprint
 
-generators = Blueprint("gen", __name__, url_prefix="/gen")
+routes = Blueprint(__name__, __name__, url_prefix=f"/{__name__}")
 
 
-@generators.route("/uuid")
+@routes.route("/uuid")
 def unversioned_uuid():
     return {
         "status": 200,
@@ -13,8 +13,8 @@ def unversioned_uuid():
     }
 
 
-@generators.route("/uuid/<int:version>")
-@generators.route("/uuid/v<int:version>")
+@routes.route("/uuid/<int:version>")
+@routes.route("/uuid/v<int:version>")
 def versioned_uuid(version: int):
     resp = {
         "uuid": "",
@@ -37,8 +37,8 @@ def versioned_uuid(version: int):
     return {"status": 200, **resp}
 
 
-@generators.route("/uuid/<int:version>/<string:uuidtype>/<string:uuidns>")
-@generators.route("/uuid/v<int:version>/<string:uuidtype>/<string:uuidns>")
+@routes.route("/uuid/<int:version>/<string:uuidtype>/<string:uuidns>")
+@routes.route("/uuid/v<int:version>/<string:uuidtype>/<string:uuidns>")
 def namespaced_uuid(version: int, uuidtype: str, uuidns: str):
     resp = {
         "uuid": "",

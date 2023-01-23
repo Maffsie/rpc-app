@@ -1,10 +1,10 @@
-from flask import Blueprint, current_app
+from flask import Blueprint
 
-simple = Blueprint("simple", __name__, url_prefix="/")
+routes = Blueprint(__name__, __name__, url_prefix="/")
 
 
-@simple.route("/ping")
-@simple.route("/ping/js")
-@simple.route("/ping/py/2")
+@routes.route("/ping")
+@routes.route("/ping/js")
+@routes.route("/ping/py/2")
 def ping():
     return "pong"
