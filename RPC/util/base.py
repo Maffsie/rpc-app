@@ -96,7 +96,9 @@ class Api(Blueprint):
     def __init__(self, url_prefix: str = None, *args, **kwargs):
         caller = stack()[1].function
         callermod = getmodule(stack()[1]).__name__
-        if url_prefix is None or isinstance(url_prefix, str) and len(url_prefix) is 0:
+        if caller == "<module>":
+            caller = callermod.split(".")[-1]
+        if url_prefix is None or isinstance(url_prefix, str) and len(url_prefix) == 0:
             url_prefix = f"/{caller}"
         super().__init__(caller, callermod, *args, url_prefix=url_prefix, **kwargs)
 
