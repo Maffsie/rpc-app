@@ -22,6 +22,8 @@ class LogLevel(Enum):
     ERR = 5
     E = 5
     YOUHAVEFUCKEDUP = 6
+    FATAL = 6
+    F = 6
 
 
 class Logger:
@@ -47,3 +49,24 @@ class Logger:
             print(f"{self.cid} -> {this_cid} args: {args}")
         if kwargs:
             print(f"{self.cid} -> {this_cid} kwargs: {kwargs}")
+
+    def debug(self, *args, **kwargs):
+        return self.write(LogLevel.DEBUG, *args, **kwargs)
+
+    def verbose(self, *args, **kwargs):
+        return self.write(LogLevel.VERBOSE, *args, **kwargs)
+
+    def notice(self, *args, **kwargs):
+        return self.write(LogLevel.NOTICE, *args, **kwargs)
+
+    def info(self, *args, **kwargs):
+        return self.write(LogLevel.INFO, *args, **kwargs)
+
+    def warn(self, *args, **kwargs):
+        return self.write(LogLevel.WARN, *args, **kwargs)
+
+    def error(self, *args, **kwargs):
+        return self.write(LogLevel.ERROR, *args, **kwargs)
+
+    def fatal(self, *args, **kwargs):
+        return self.write(LogLevel.FATAL, *args, **kwargs)

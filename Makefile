@@ -166,7 +166,7 @@ arm64build:
 arm64deploy:
 	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest $(SWARM_SVC)
 
-# TODO: i686build, i686deploy
+# TODO: i686build, i686deploy, x64build, x64deploy, arm32build, arm32deploy
 #  ideally there'd be build and deploy targets for every arch. machine i have access to
 
 localtest: format gitcommit gitpush arm64build arm64deploy

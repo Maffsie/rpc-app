@@ -4,10 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+# core dependencies
 flask = "*"
 gunicorn = "*"
-pillow = "*"
 python-dotenv = "*"
+# util.graphics
+pillow = "*"
+# vnd.octopus
+influxdb = "*"
+python-dateutil = "*"
+requests = "*"
+python-digitalocean = "*"
+tailscale = "*"
 
 [dev-packages]
 black = "*"

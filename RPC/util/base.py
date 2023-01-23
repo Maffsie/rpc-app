@@ -62,3 +62,28 @@ class Base:
             self.app_config[entry] = load_conf_one(
                 entry.upper(), self.app_config[entry]
             )
+
+
+class Micro:
+    conf = {}
+    log: Logger = None
+
+    def __init__(
+        self,
+        conf: dict,
+        correlation_id: Union[UUID, None] = None,
+        logger: Logger = None,
+        *args,
+        **kwargs,
+    ):
+        self.conf = conf
+        if logger is not None:
+            self.log = logger
+        else:
+            self.log = Logger(correlation_id=correlation_id)
+            self.log._debug = self.conf.get("debug")
+        self.__subinit__(*args, **kwargs)
+
+    # stub
+    def __subinit__(self, *args, **kwargs):
+        pass
