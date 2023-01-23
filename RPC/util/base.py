@@ -1,4 +1,4 @@
-from inspect import getmodule, stack
+import inspect
 from os import environ as env
 from typing import Union
 from uuid import UUID
@@ -93,14 +93,17 @@ class Micro:
 
 
 class Api(Blueprint):
-    def __init__(self, url_prefix: str = None, *args, **kwargs):
-        caller = stack()[1].function
-        callermod = getmodule(stack()[1]).__name__
-        if caller == "<module>":
-            caller = callermod.split(".")[-1]
+    def __init__(self, *args, url_prefix: str = None, **kwargs):
+        stack = inspect.stack()
+        caller = stack[1].function
+        callermod = inspect.getmodule(stack[1]).__name__
+        if caller in ("<module>", "__init__"):
+            caller = stack[1].filename.split(".")[0]
         if url_prefix is None or isinstance(url_prefix, str) and len(url_prefix) == 0:
             url_prefix = f"/{caller}"
-        super().__init__(caller, callermod, *args, url_prefix=url_prefix, **kwargs)
+        super().__init__(
+            *args, name=caller, import_name=callermod, url_prefix=url_prefix, **kwargs
+        )
 
     def include(self, *args):
         [self.register_blueprint(api) for api in args]
