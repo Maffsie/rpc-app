@@ -6,10 +6,8 @@ routes = Api(url_prefix="/")
 
 
 @routes.route("/fritzin")
-def fritzbox_s2h(*args, **kwargs):
-    current_app.log.verbose(
-        msg="wow!", args=args, kwargs=kwargs, reqargs=request.args, requrl=request.url
-    )
+def fritzbox_s2h():
+    print(f"/fritzin! args={request.args} url={request.url}")
     return (
         "success?",
         200,
