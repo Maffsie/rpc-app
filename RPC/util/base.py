@@ -94,12 +94,21 @@ class Micro:
 
 class Api(Blueprint):
     def __init__(self, *args, url_prefix: str = None, **kwargs):
-        stack = inspect.stack()
-        caller = stack[1].function
-        callermod = inspect.getmodule(stack[1]).__name__
-        if caller in ("<module>", "__init__"):
-            caller = stack[1].filename.split(".")[0]
-        if url_prefix is None or isinstance(url_prefix, str) and len(url_prefix) == 0:
+        # this is absolutely hideous
+        # but there's not really an obvious way to more cleanly get the caller's name
+        # and package without doing introspection like this.
+        # the upshot is, however, that instead of
+        # Blueprint(name="myapi", import_name=__name__, url_prefix="/myapi")
+        # it's just.. Api()
+        # which resolves to Blueprint(name="myapi", import_name="MyPackage.myapi", ...)
+        calling_frame = inspect.stack()[1]
+        caller = calling_frame.function
+        callermod = calling_frame.frame.f_locals["__name__"]
+        if caller == "<module>":
+            caller = calling_frame.filename.split("/")[-1].partition(".")[0]
+        if caller == "__init__":
+            caller = calling_frame.frame.f_locals["__package__"].split(".")[-1]
+        if url_prefix is None or (isinstance(url_prefix, str) and len(url_prefix) == 0):
             url_prefix = f"/{caller}"
         super().__init__(
             *args, name=caller, import_name=callermod, url_prefix=url_prefix, **kwargs
