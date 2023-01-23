@@ -44,11 +44,11 @@ class Logger:
         if level == LogLevel.DEBUG and not self._debug:
             return
         this_cid = uuid(self.cid.node)
-        print(f"{self.cid} {level.name}: {msg}")
+        print(f"{self.cid} {level.name}: {msg}", flush=True)
         if args:
-            print(f"{self.cid} -> {this_cid} args: {args}")
+            print(f"{self.cid} -> {this_cid} args: {args}", flush=True)
         if kwargs:
-            print(f"{self.cid} -> {this_cid} kwargs: {kwargs}")
+            print(f"{self.cid} -> {this_cid} kwargs: {kwargs}", flush=True)
 
     def debug(self, *args, **kwargs):
         return self.write(LogLevel.DEBUG, *args, **kwargs)
