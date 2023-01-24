@@ -18,7 +18,7 @@ GITREPO := https://github.com/Maffsie/rpc-app.git
 DOCKER_TAG := maffsie/rpc
 GITEA_TAG := commit.pup.cloud/maff/rpc
 
-ARCH := $(shell uname -m)
+ARCH := $(shell $(ENVBIN) uname -m)
 ARM64USR ?= root
 ARM64HOST ?= a64-p4-8-0.wuf.one
 SWARM_SVC := api_rpc
