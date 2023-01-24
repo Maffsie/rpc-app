@@ -1,6 +1,6 @@
 from flask import Flask
 
-from RPC.util import Base
+from RPC.util.base import Base
 
 
 class RPCApp(Base, Flask):

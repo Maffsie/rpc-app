@@ -39,6 +39,12 @@ class Logger(Configurable):
         "gelf_port": 443,
         "gelf_tls_validate": False,
     }
+    errnos = {
+        "gelf_host": "FGHUNSET",
+    }
+    errdes = {
+        "FGHUNSET": "GELF host not set!",
+    }
 
     def __init__(
         self,

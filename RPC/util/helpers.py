@@ -16,8 +16,10 @@ class Configurable:
         "NDEBUGSET": "Debug logging is enabled.",
     }
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         preconfigure()
+        self.load_conf()
+        super().__init__(*args, **kwargs)
 
     def load_conf(self):
         """
