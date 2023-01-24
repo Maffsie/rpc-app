@@ -1,4 +1,3 @@
-from .base import Base
 from .coercion import coerce_type
 from .conf import preconfigure
 from .decorators import throws

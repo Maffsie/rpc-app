@@ -6,8 +6,8 @@ from uuid import uuid1 as uuid
 
 from pygelf import GelfHttpsHandler
 
-from .base import Micro
 from .coercion import coerce_type
+from .helpers import Configurable
 
 
 class LogLevel(Enum):
@@ -30,10 +30,10 @@ class LogLevel(Enum):
     F = 6
 
 
-class Logger(Micro):
+class Logger(Configurable):
     _logger = None
 
-    conf = {
+    app_config = {
         "debug": False,
         "gelf_host": str,
         "gelf_port": 443,
@@ -50,13 +50,13 @@ class Logger(Micro):
         self.cid = correlation_id if correlation_id is not None else uuid()
         super().__init__(*args, **kwargs)
         if debug:
-            self.conf["debug"] = debug
+            self.app_config["debug"] = debug
         self._logger = logging.getLogger()
         self._logger.addHandler(
             GelfHttpsHandler(
-                host=self.conf.get("gelf_host"),
-                port=self.conf.get("gelf_port"),
-                validate=self.conf.get("gelf_tls_validate"),
+                host=self.app_config.get("gelf_host"),
+                port=self.app_config.get("gelf_port"),
+                validate=self.app_config.get("gelf_tls_validate"),
             )
         )
         logging.captureWarnings(True)
@@ -69,7 +69,7 @@ class Logger(Micro):
         """
         if not isinstance(level, LogLevel):
             level = coerce_type(level, LogLevel)
-        if level == LogLevel.DEBUG and not self.conf.get("debug"):
+        if level == LogLevel.DEBUG and not self.app_config.get("debug"):
             return
         self._logger.log(
             level.value, msg, args=args, extra={"correlation_id": self.cid, **kwargs}
