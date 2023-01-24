@@ -178,7 +178,7 @@ arm64build:
 	ssh $(ARM64USR)@$(ARM64HOST) rm -rf /tmp/a64rpc
 
 arm64deploy:
-	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest-$(ARCH) $(SWARM_SVC)
+	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest-aarch64 $(SWARM_SVC)
 
 # TODO: i686build, i686deploy, x64build, x64deploy, arm32build, arm32deploy
 #  ideally there'd be build and deploy targets for every arch. machine i have access to
