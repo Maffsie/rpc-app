@@ -7,14 +7,17 @@ name = "pypi"
 # core dependencies
 flask = "*"
 gunicorn = "*"
+pygelf = "*"
 python-dotenv = "*"
+# cron.tailzone
+python-digitalocean = "*"
 # util.graphics
 pillow = "*"
 # vnd.octopus
 influxdb = "*"
 python-dateutil = "*"
 requests = "*"
-python-digitalocean = "*"
+# vnd.tailscale
 tailscale = "*"
 
 [dev-packages]

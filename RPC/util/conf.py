@@ -18,7 +18,6 @@ def preconfigure(
         "/run/secrets",
     ],
 ):
-    print("preconfigure")
     # No need to error-check this, dotenv handles it fine
     [loadenv(dotenv_path=fp, verbose=True) for fp in conf_file]
     # Need to error-check this

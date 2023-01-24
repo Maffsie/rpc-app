@@ -1,8 +1,12 @@
+import logging
 from enum import Enum
 from typing import Union
 from uuid import UUID
 from uuid import uuid1 as uuid
 
+from pygelf import GelfHttpsHandler
+
+from .base import Micro
 from .coercion import coerce_type
 
 
@@ -26,12 +30,36 @@ class LogLevel(Enum):
     F = 6
 
 
-class Logger:
-    _debug: bool = False
+class Logger(Micro):
+    _logger = None
 
-    def __init__(self, correlation_id: Union[UUID, None] = None, debug: bool = False):
+    conf = {
+        "debug": False,
+        "gelf_host": str,
+        "gelf_port": 443,
+        "gelf_tls_validate": False,
+    }
+
+    def __init__(
+        self,
+        *args,
+        correlation_id: Union[UUID, None] = None,
+        debug: bool = False,
+        **kwargs,
+    ):
         self.cid = correlation_id if correlation_id is not None else uuid()
-        self._debug = debug
+        super().__init__(*args, **kwargs)
+        if debug:
+            self.conf["debug"] = debug
+        self._logger = logging.getLogger()
+        self._logger.addHandler(
+            GelfHttpsHandler(
+                host=self.conf.get("gelf_host"),
+                port=self.conf.get("gelf_port"),
+                validate=self.conf.get("gelf_tls_validate"),
+            )
+        )
+        logging.captureWarnings(True)
 
     def write(self, level: LogLevel, msg: str, *args, **kwargs):
         """
@@ -41,14 +69,11 @@ class Logger:
         """
         if not isinstance(level, LogLevel):
             level = coerce_type(level, LogLevel)
-        if level == LogLevel.DEBUG and not self._debug:
+        if level == LogLevel.DEBUG and not self.conf.get("debug"):
             return
-        this_cid = uuid(self.cid.node)
-        print(f"{self.cid} {level.name}: {msg}", flush=True)
-        if args:
-            print(f"{self.cid} -> {this_cid} args: {args}", flush=True)
-        if kwargs:
-            print(f"{self.cid} -> {this_cid} kwargs: {kwargs}", flush=True)
+        self._logger.log(
+            level.value, msg, args=args, extra={"correlation_id": self.cid, **kwargs}
+        )
 
     def debug(self, *args, **kwargs):
         return self.write(LogLevel.DEBUG, *args, **kwargs)
