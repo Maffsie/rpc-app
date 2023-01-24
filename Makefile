@@ -18,6 +18,7 @@ GITREPO := https://github.com/Maffsie/rpc-app.git
 DOCKER_TAG := maffsie/rpc
 GITEA_TAG := commit.pup.cloud/maff/rpc
 
+ARCH := $(shell uname -m)
 ARM64USR ?= root
 ARM64HOST ?= a64-p4-8-0.wuf.one
 SWARM_SVC := api_rpc
@@ -81,12 +82,19 @@ requirements: .venv
 
 # Build the docker container and ensure it's tagged with the necessary tags
 docker-build:
-	@$(ENVBIN) docker build -t $(DOCKER_TAG):latest -t $(GITEA_TAG):latest .
+	@$(ENVBIN) docker build \
+		-t $(DOCKER_TAG):latest \
+		-t $(DOCKER_TAG):latest-$(ARCH) \
+		-t $(GITEA_TAG):latest \
+		-t $(GITEA_TAG):latest-$(ARCH) \
+		.
 
 # Push the built container up to all tagged repos, ensuring a fresh build first
 docker-push: docker-build
-	@$(ENVBIN) docker push -a $(DOCKER_TAG)
-	@$(ENVBIN) docker push -a $(GITEA_TAG)
+	@$(ENVBIN) docker push $(DOCKER_TAG):latest
+	@$(ENVBIN) docker push $(DOCKER_TAG):latest-$(ARCH)
+	@$(ENVBIN) docker push $(GITEA_TAG):latest
+	@$(ENVBIN) docker push $(GITEA_TAG):latest-$(ARCH)
 
 # Run the built container with the API exposed on the configured port, ensuring a fresh build first
 docker-run: docker-build

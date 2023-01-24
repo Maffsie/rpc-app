@@ -32,6 +32,7 @@ USER root:root
 # Is it psychopathic to use make for everything? probably
 #  will that stop me? absolutely not.
 RUN apk add -t runtime-deps \
+      freetype jpeg \
       make && \
     apk add -t healthcheck-deps \
       curl && \
