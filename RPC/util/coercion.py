@@ -74,6 +74,9 @@ def coerce_type(input: Any, coerce: T, require: bool = False) -> Union[T, None]:
     """
 
     def _coerce(input: Any, coerce: T, require: bool) -> Union[T, None]:
+        # required because otherwise str(None) returns "None"
+        if isinstance(coerce, type) and input is None:
+            return input
         if not isinstance(coerce, type):
             coerce = type(coerce)
         if type(input) is coerce or coerce is type(None):

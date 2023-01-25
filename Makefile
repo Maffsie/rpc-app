@@ -48,7 +48,7 @@ EXPOSE_PORT ?= 8069
 .PHONY: docker-build docker-push docker-run docker
 #misc. tasks
 ##git workflow
-.PHONY: gitcommit gitpull gitpush
+.PHONY: gitcommit gitpull gitpush push
 ##build - multiarch
 .PHONY: docker-build-aarch64 docker-build-x64
 ##deployment - arm64
@@ -136,11 +136,11 @@ $(RESTGTS): resources
 #  Depends on requirements because you'd normally run this during dev, where requirements
 #   are being changed
 flask-run: requirements $(RESTGTS) banner
-	pipenv run flask -A $(SRCPATH) run $(ARGS)
+	pipenv run flask -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
 
 # Starts the Flask development server in debug mode
 flask-debug: requirements $(RESTGTS) banner
-	pipenv run flask --debug -A $(SRCPATH) run $(ARGS)
+	pipenv run flask --debug -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
 
 # Starts the gunicorn production server
 #  Does not depend on requirements, because this would be run in a packaged scenario
@@ -204,4 +204,4 @@ docker-build-x64:
 arm64deploy:
 	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest-aarch64 $(SWARM_SVC)
 
-localtest: format gitcommit gitpush arm64build arm64deploy
+localtest: format gitcommit gitpush docker-build-aarch64 arm64deploy

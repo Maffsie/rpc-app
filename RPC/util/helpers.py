@@ -33,19 +33,20 @@ class Configurable:
             If the value is not present and an errno is set for its absence, log that.
             """
             deftype = default
-            if not isinstance(deftype, type):
-                deftype = type(deftype)
-            value = coerce_type(env.get(name, default), deftype)
+            if isinstance(deftype, type):
+                default = None
+            value = coerce_type(env.get(name.upper(), env.get(name, default)), deftype)
             # warn(f"env ${name}? {type(value)} '{value}' : {deftype} '{default}'")
             err = self.errnos.get(name, None)
+            err_d = self.errdes.get(err, 'no descriptor for this errno')
             if err is not None and value is None:
-                warn(f"{err} ¦ {self.errdes.get(err, 'no descriptor for this errno')}")
+                warn(f"{err} ¦ {err_d}")
                 match err[0]:
-                    case "E":
-                        raise Exception(err)
+                    case "E" | "F":
+                        raise Exception(err, err_d)
             return value
 
         for entry in self.app_config:
             self.app_config[entry] = load_conf_one(
-                entry.upper(), self.app_config[entry]
+                entry, self.app_config[entry]
             )
