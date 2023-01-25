@@ -4,7 +4,7 @@ from typing import Union
 from uuid import UUID
 from uuid import uuid1 as uuid
 
-from pygelf import GelfHttpsHandler
+from logging_loki import LokiHandler
 
 from .coercion import coerce_type
 from .helpers import Configurable
@@ -31,19 +31,18 @@ class LogLevel(Enum):
 
 
 class Logger(Configurable):
-    _logger = None
+    _logger: logging.Logger = None
 
     app_config = {
         "debug": False,
-        "gelf_host": str,
-        "gelf_port": 443,
-        "gelf_tls_validate": False,
+        "loki_url": str,
+        "loki_port": 443,
     }
     errnos = {
-        "gelf_host": "FGHUNSET",
+        "loki_url": "FLUUNSET",
     }
     errdes = {
-        "FGHUNSET": "GELF host not set!",
+        "FLUUNSET": "Loki URL not set!",
     }
 
     def __init__(
@@ -57,15 +56,18 @@ class Logger(Configurable):
         super().__init__(*args, **kwargs)
         if debug:
             self.app_config["debug"] = debug
-        self._logger = logging.getLogger()
+        self._logger = logging.getLogger(str(self.cid))
+        self._logger.setLevel("DEBUG" if self.app_config.get("debug") else "INFO")
         self._logger.addHandler(
-            GelfHttpsHandler(
-                host=self.app_config.get("gelf_host"),
-                port=self.app_config.get("gelf_port"),
-                validate=self.app_config.get("gelf_tls_validate"),
+            LokiHandler(
+                url=self.app_config.get("loki_url"),
+                tags={
+                    "app": "RPC",
+                },
+                version="1",
             )
         )
-        logging.captureWarnings(True)
+        # logging.captureWarnings(True)
 
     def write(self, level: LogLevel, msg: str, *args, **kwargs):
         """
@@ -77,27 +79,119 @@ class Logger(Configurable):
             level = coerce_type(level, LogLevel)
         if level == LogLevel.DEBUG and not self.app_config.get("debug"):
             return
-        self._logger.log(
-            level.value, msg, args=args, extra={"correlation_id": self.cid, **kwargs}
+        print("don't use me i'm too gay")
+        raise Exception("fuckin hell")
+
+    def debug(self, msg, *args, **kwargs):
+        self._logger.debug(
+            msg,
+            extra={
+                "tags": {
+                    "correlation_id": str(self.cid),
+                },
+                "extra_args": [
+                    *args,
+                ],
+                "extra_kwargs": {
+                    **kwargs,
+                },
+            },
         )
 
-    def debug(self, *args, **kwargs):
-        return self.write(LogLevel.DEBUG, *args, **kwargs)
+    def verbose(self, msg, *args, **kwargs):
+        self._logger.log(
+            15,
+            msg,
+            extra={
+                "tags": {
+                    "correlation_id": str(self.cid),
+                },
+                "extra_args": [
+                    *args,
+                ],
+                "extra_kwargs": {
+                    **kwargs,
+                },
+            },
+        )
 
-    def verbose(self, *args, **kwargs):
-        return self.write(LogLevel.VERBOSE, *args, **kwargs)
+    def info(self, msg, *args, **kwargs):
+        self._logger.info(
+            msg,
+            extra={
+                "tags": {
+                    "correlation_id": str(self.cid),
+                },
+                "extra_args": [
+                    *args,
+                ],
+                "extra_kwargs": {
+                    **kwargs,
+                },
+            },
+        )
 
-    def notice(self, *args, **kwargs):
-        return self.write(LogLevel.NOTICE, *args, **kwargs)
+    def notice(self, msg, *args, **kwargs):
+        self._logger.log(
+            25,
+            msg,
+            extra={
+                "tags": {
+                    "correlation_id": str(self.cid),
+                },
+                "extra_args": [
+                    *args,
+                ],
+                "extra_kwargs": {
+                    **kwargs,
+                },
+            },
+        )
 
-    def info(self, *args, **kwargs):
-        return self.write(LogLevel.INFO, *args, **kwargs)
+    def warn(self, msg, *args, **kwargs):
+        self._logger.warning(
+            msg,
+            extra={
+                "tags": {
+                    "correlation_id": str(self.cid),
+                },
+                "extra_args": [
+                    *args,
+                ],
+                "extra_kwargs": {
+                    **kwargs,
+                },
+            },
+        )
 
-    def warn(self, *args, **kwargs):
-        return self.write(LogLevel.WARN, *args, **kwargs)
+    def error(self, msg, *args, **kwargs):
+        self._logger.error(
+            msg,
+            extra={
+                "tags": {
+                    "correlation_id": str(self.cid),
+                },
+                "extra_args": [
+                    *args,
+                ],
+                "extra_kwargs": {
+                    **kwargs,
+                },
+            },
+        )
 
-    def error(self, *args, **kwargs):
-        return self.write(LogLevel.ERROR, *args, **kwargs)
-
-    def fatal(self, *args, **kwargs):
-        return self.write(LogLevel.FATAL, *args, **kwargs)
+    def fatal(self, msg, *args, **kwargs):
+        self._logger.critical(
+            msg,
+            extra={
+                "tags": {
+                    "correlation_id": str(self.cid),
+                },
+                "extra_args": [
+                    *args,
+                ],
+                "extra_kwargs": {
+                    **kwargs,
+                },
+            },
+        )

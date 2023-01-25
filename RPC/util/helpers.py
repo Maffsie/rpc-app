@@ -38,7 +38,7 @@ class Configurable:
             value = coerce_type(env.get(name.upper(), env.get(name, default)), deftype)
             # warn(f"env ${name}? {type(value)} '{value}' : {deftype} '{default}'")
             err = self.errnos.get(name, None)
-            err_d = self.errdes.get(err, 'no descriptor for this errno')
+            err_d = self.errdes.get(err, "no descriptor for this errno")
             if err is not None and value is None:
                 warn(f"{err} ¦ {err_d}")
                 match err[0]:
@@ -47,6 +47,4 @@ class Configurable:
             return value
 
         for entry in self.app_config:
-            self.app_config[entry] = load_conf_one(
-                entry, self.app_config[entry]
-            )
+            self.app_config[entry] = load_conf_one(entry, self.app_config[entry])
