@@ -21,6 +21,8 @@ GITEA_TAG := commit.pup.cloud/maff/rpc
 ARCH := $(shell $(ENVBIN) uname -m)
 ARM64USR ?= root
 ARM64HOST ?= a64-p4-8-0.wuf.one
+X64USR ?= root
+X64HOST ?= eu-fsn-hv3.wuf.one
 SWARM_SVC := api_rpc
 
 EXPOSE_PORT ?= 8069
@@ -47,8 +49,10 @@ EXPOSE_PORT ?= 8069
 #misc. tasks
 ##git workflow
 .PHONY: gitcommit gitpull gitpush
-##build and deployment - arm64
-.PHONY: arm64build arm64deploy
+##build - multiarch
+.PHONY: docker-build-aarch64 docker-build-x64
+##deployment - arm64
+.PHONY: arm64deploy
 ##dev helping
 .PHONY: localtest
 
@@ -172,15 +176,32 @@ gitcommit:
 gitpush:
 	git push
 
-arm64build:
+push: gitcommit gitpush
+
+# These can be parallelised but how do i tell make it can do that
+# hashtag too afraid to just do make -j2
+docker-build-aarch64:
 	ssh $(ARM64USR)@$(ARM64HOST) git clone $(GITREPO) /tmp/a64rpc
 	ssh $(ARM64USR)@$(ARM64HOST) make -C /tmp/a64rpc docker-push
 	ssh $(ARM64USR)@$(ARM64HOST) rm -rf /tmp/a64rpc
 
+docker-build-x64:
+	ssh $(X64USR)@$(X64HOST) git clone $(GITREPO) /tmp/x64rpc
+	ssh $(X64USR)@$(X64HOST) make -C /tmp/x64rpc docker-push
+	ssh $(X64USR)@$(X64HOST) rm -rf /tmp/x64rpc
+
+# TODO: docker-build-arch targets
+# 	arm32v5, arm32v6, arm32v7 - maybe the CHIPs, the android things board
+# 	arm32 - rpi2
+# 	i386 - x40, one of the vaios, the wibrain, dunno
+# 	mipsel - GL750
+# 	mips64le - dunno if any openwrt boxen exist for this, may have to use qemu
+# 	ppc32 - does docker for ppc32 even exist? could use the ibook
+# 	ppc64le - will have to use qemu for that i think
+# 	riscv64 - need to buy a riscv host tbh
+# 	s390x - will have to use qemu for that
+
 arm64deploy:
 	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest-aarch64 $(SWARM_SVC)
-
-# TODO: i686build, i686deploy, x64build, x64deploy, arm32build, arm32deploy
-#  ideally there'd be build and deploy targets for every arch. machine i have access to
 
 localtest: format gitcommit gitpush arm64build arm64deploy
