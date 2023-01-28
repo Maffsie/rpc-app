@@ -19,10 +19,13 @@ DOCKER_TAG := maffsie/rpc
 GITEA_TAG := commit.pup.cloud/maff/rpc
 
 ARCH := $(shell $(ENVBIN) uname -m)
+TSDOMAIN ?= wuf.one
 ARM64USR ?= root
-ARM64HOST ?= a64-p4-8-0.wuf.one
+ARM64HOST ?= a64-p4-8-0.$(TSDOMAIN)
+I386USR ?= maff
+I386HOST ?= x40.$(TSDOMAIN)
 X64USR ?= root
-X64HOST ?= eu-fsn-hv3.wuf.one
+X64HOST ?= eu-fsn-hv3.$(TSDOMAIN)
 SWARM_SVC := api_rpc
 
 EXPOSE_PORT ?= 8069
@@ -50,7 +53,7 @@ EXPOSE_PORT ?= 8069
 ##git workflow
 .PHONY: gitcommit gitpull gitpush push
 ##build - multiarch
-.PHONY: docker-build-aarch64 docker-build-x64
+.PHONY: docker-build-aarch64 docker-build-i386 docker-build-x64
 ##deployment - arm64
 .PHONY: arm64deploy
 ##dev helping
@@ -184,6 +187,11 @@ docker-build-aarch64:
 	ssh $(ARM64USR)@$(ARM64HOST) git clone $(GITREPO) /tmp/a64rpc
 	ssh $(ARM64USR)@$(ARM64HOST) make -C /tmp/a64rpc docker-push
 	ssh $(ARM64USR)@$(ARM64HOST) rm -rf /tmp/a64rpc
+
+docker-build-i386:
+	ssh $(I386USR)@$(I386HOST) git clone $(GITREPO) /tmp/i386rpc
+	ssh $(I386USR)@$(I386HOST) make -C /tmp/i386rpc docker-push
+	ssh $(I386USR)@$(I386HOST) rm -rf /tmp/i386rpc
 
 docker-build-x64:
 	ssh $(X64USR)@$(X64HOST) git clone $(GITREPO) /tmp/x64rpc
