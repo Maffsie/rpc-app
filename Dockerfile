@@ -60,3 +60,8 @@ HEALTHCHECK --interval=10s \
             CMD [ "make", "healthcheck" ]
 
 CMD [ "make", "gunicorn-run" ]
+
+LABEL org.opencontainers.image.url="https://github.com/Maffsie/rpc-app" \
+			org.opencontainers.image.source="https://github.com/Maffsie/rpc-app.git" \
+			org.opencontainers.image.name="RPC-App" \
+			org.opencontainers.image.description="an api server, but bad!"
