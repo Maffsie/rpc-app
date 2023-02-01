@@ -49,7 +49,9 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
         }
         if page is not None:
             params["page"] = page
-        resp = get(uri, params=params, auth=(self.app_config.get("octopus_api_key"), ""))
+        resp = get(
+            uri, params=params, auth=(self.app_config.get("octopus_api_key"), "")
+        )
         resp.raise_for_status()
         res = resp.json()
         ret = res.get("results", [])
@@ -115,7 +117,9 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
                 "measurement": series,
                 "tags": _tags(measurement),
                 "time": measurement["interval_end"],
-                "fields": _fields(measurement, self.app_config.get("cron_octopus_gasfac")),
+                "fields": _fields(
+                    measurement, self.app_config.get("cron_octopus_gasfac")
+                ),
             }
             for measurement in metrics
         ]

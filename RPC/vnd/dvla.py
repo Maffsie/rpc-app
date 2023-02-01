@@ -2,9 +2,9 @@ from json import JSONDecodeError
 from re import compile
 
 from RPC.util.decorators import throws, validator
-from RPC.util.errors import InvalidInputError, InternalOperationalError
+from RPC.util.errors import InternalOperationalError, InvalidInputError
 from RPC.util.helpers import Configurable
-from RPC.util.layers import WithLogging, IApi
+from RPC.util.layers import IApi, WithLogging
 from RPC.util.models import DVLAVehicle
 
 v_regnum = compile("^[a-np-zA-NP-Z0-9]+$")
@@ -18,9 +18,7 @@ class Doovla(IApi, WithLogging, Configurable):
     errnos = {
         "DOOVLA_API_KEY": "FDVLAAK",
     }
-    errdes = {
-        "FDVLAAK": "No API key present for the DVLA!"
-    }
+    errdes = {"FDVLAAK": "No API key present for the DVLA!"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,17 +29,24 @@ class Doovla(IApi, WithLogging, Configurable):
     @validator(lambda x: v_regnum.match(x))
     def lookup(self, reg: str) -> DVLAVehicle | str:
         try:
-            resp = self.post("vehicle-enquiry/v1/vehicles", data={
-                "registrationNumber": reg,
-            })
+            resp = self.post(
+                "vehicle-enquiry/v1/vehicles",
+                data={
+                    "registrationNumber": reg,
+                },
+            )
             match resp.status_code:
                 case 200:
                     return DVLAVehicle(resp.json())
                 case 404:
-                    return "Registration number not recognised. If you know the registration " \
-                           "number to be accurate and previously valid and registered, " \
-                           "the vehicle may have been scrapped."
+                    return (
+                        "Registration number not recognised. If you know the registration "
+                        "number to be accurate and previously valid and registered, "
+                        "the vehicle may have been scrapped."
+                    )
                 case _:
-                    raise InternalOperationalError(f"Status {resp.status_code} from DVLA", resp)
+                    raise InternalOperationalError(
+                        f"Status {resp.status_code} from DVLA", resp
+                    )
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)

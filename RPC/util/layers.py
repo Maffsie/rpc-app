@@ -1,8 +1,7 @@
 import logging
 
-from requests import Session
-
 from influxdb import InfluxDBClient
+from requests import Session
 
 from RPC.util.helpers import load_conf_static
 
@@ -19,7 +18,9 @@ class WithInfluxDB:
         "data_influx_pass": str,
     }
 
-    def __init__(self, *args, db: str | None = None, dbvar: str | None = None, **kwargs):
+    def __init__(
+        self, *args, db: str | None = None, dbvar: str | None = None, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         # TODO: This is messy as fuck
         if db is None or db == "" and dbvar is not None and dbvar != "":
@@ -52,4 +53,6 @@ class IApi(Session):
         super().__init__(*args, **kwargs)
 
     def request(self, method, url, *args, **kwargs):
-        return super().request(method=method, url=f"{self.baseurl}/{url}", *args, **kwargs)
+        return super().request(
+            method=method, url=f"{self.baseurl}/{url}", *args, **kwargs
+        )

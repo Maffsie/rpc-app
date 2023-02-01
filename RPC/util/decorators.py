@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask import Response
 
-from RPC.util.errors import RPCException, InvalidInputError
+from RPC.util.errors import InvalidInputError, RPCException
 
 
 def throws(*etypes):
@@ -28,12 +28,13 @@ def throws(*etypes):
 
 
 def validator(vfunc):
-
     def wrapper(func):
         @wraps(func)
         def call(*args, **kwargs):
             if not vfunc(args[0]):
                 raise InvalidInputError(args[0])
             return func(*args, **kwargs)
+
         return call
+
     return wrapper

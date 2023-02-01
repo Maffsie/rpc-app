@@ -205,6 +205,7 @@ class EuroStatus(Enum):
     """
     European Emission Standards bands
     """
+
     EURO0 = auto()
     EUROI = auto()
     EUROII = auto()
@@ -231,6 +232,7 @@ class FuelType(Enum):
     """
     Fuel types
     """
+
     Diesel = auto()
     Electricity = auto()
     Petrol = auto()
@@ -242,6 +244,7 @@ class IVATypeApproval(Enum):
     Individual Vehicle Approval types
     Not included are types C, R, S, and T (agricultural) or Non-road mobile machinery
     """
+
     L1e = "A low-powered moped or two-wheeled vehicle"
     L2e = "A low-powered three-wheeled vehicle"
     L3e = "A motorcycle"
@@ -313,50 +316,76 @@ class DVLAVehicle:
         self.euro = coerce_type(ves_response["euroStatus"], EuroStatus)
         self.type_app = ves_response["typeApproval"].upper()
 
-        self.reg_year = coerce_type(ves_response["monthOfFirstRegistration"].split('-')[0], int)
-        self.reg_month = coerce_type(ves_response["monthOfFirstRegistration"].split('-')[1], int)
+        self.reg_year = coerce_type(
+            ves_response["monthOfFirstRegistration"].split("-")[0], int
+        )
+        self.reg_month = coerce_type(
+            ves_response["monthOfFirstRegistration"].split("-")[1], int
+        )
         self.dvla_reg = ves_response["monthOfFirstDvlaRegistration"]
-        self.dvla_reg_year = coerce_type(ves_response["monthOfFirstDvlaRegistration"].split('-')[0], int)
-        self.dvla_reg_month = coerce_type(ves_response["monthOfFirstDvlaRegistration"].split('-')[1], int)
+        self.dvla_reg_year = coerce_type(
+            ves_response["monthOfFirstDvlaRegistration"].split("-")[0], int
+        )
+        self.dvla_reg_month = coerce_type(
+            ves_response["monthOfFirstDvlaRegistration"].split("-")[1], int
+        )
         self.exportable = coerce_type(ves_response["markedForExport"], bool)
 
         self.vfivec = ves_response["dateOfLastV5CIssued"]
-        self.vfivec_year = coerce_type(ves_response["dateOfLastV5CIssued"].split('-')[0], int)
-        self.vfivec_month = coerce_type(ves_response["dateOfLastV5CIssued"].split('-')[1], int)
-        self.vfivec_day = coerce_type(ves_response["dateOfLastV5CIssued"].split('-')[2], int)
+        self.vfivec_year = coerce_type(
+            ves_response["dateOfLastV5CIssued"].split("-")[0], int
+        )
+        self.vfivec_month = coerce_type(
+            ves_response["dateOfLastV5CIssued"].split("-")[1], int
+        )
+        self.vfivec_day = coerce_type(
+            ves_response["dateOfLastV5CIssued"].split("-")[2], int
+        )
 
         self.taxed = coerce_type(ves_response["taxStatus"], bool)
-        self.tax_due_year = coerce_type(ves_response["taxDueDate"].split('-')[0], int)
-        self.tax_due_month = coerce_type(ves_response["taxDueDate"].split('-')[1], int)
-        self.tax_due_day = coerce_type(ves_response["taxDueDate"].split('-')[2], int)
+        self.tax_due_year = coerce_type(ves_response["taxDueDate"].split("-")[0], int)
+        self.tax_due_month = coerce_type(ves_response["taxDueDate"].split("-")[1], int)
+        self.tax_due_day = coerce_type(ves_response["taxDueDate"].split("-")[2], int)
         self.art_end_date = ves_response["artEndDate"]
 
         self.moted = coerce_type(ves_response["motStatus"], bool)
-        self.mot_until_year = coerce_type(ves_response["motExpiryDate"].split('-')[0], int)
-        self.mot_until_month = coerce_type(ves_response["motExpiryDate"].split('-')[1], int)
-        self.mot_until_day = coerce_type(ves_response["motExpiryDate"].split('-')[2], int)
+        self.mot_until_year = coerce_type(
+            ves_response["motExpiryDate"].split("-")[0], int
+        )
+        self.mot_until_month = coerce_type(
+            ves_response["motExpiryDate"].split("-")[1], int
+        )
+        self.mot_until_day = coerce_type(
+            ves_response["motExpiryDate"].split("-")[2], int
+        )
 
     @property
     def str_basic(self) -> str:
-        return f"Vehicle with registration number {self.number} is a {self.colour} {self.year} " \
-               f"{self.manufacturer}, whose wheel layout is {self.layout}. " \
-               f"It consumes {self.fuel.value}. " \
-               f"It was registered during the month of {self.reg_month}," \
-               f"{self.reg_year}{self.str_dvlareg}. " \
-               f"It is {'' if self.exportable else 'not '} marked for export. {self.str_euro}"
+        return (
+            f"Vehicle with registration number {self.number} is a {self.colour} {self.year} "
+            f"{self.manufacturer}, whose wheel layout is {self.layout}. "
+            f"It consumes {self.fuel.value}. "
+            f"It was registered during the month of {self.reg_month},"
+            f"{self.reg_year}{self.str_dvlareg}. "
+            f"It is {'' if self.exportable else 'not '} marked for export. {self.str_euro}"
+        )
 
     @property
     def str_dvlareg(self) -> str:
         if not self.dvla_reg:
             return ""
-        return f" (and was first registered to the DVLA during the month of {self.dvla_reg_month}" \
-               f", {self.dvla_reg_year})"
+        return (
+            f" (and was first registered to the DVLA during the month of {self.dvla_reg_month}"
+            f", {self.dvla_reg_year})"
+        )
 
     @property
     def str_euro(self) -> str:
         if not self.euro:
-            return "The emissions of this vehicle have not been classified under the European " \
-                   "Emission Standards band rating, or its classification is not known to the DVLA"
+            return (
+                "The emissions of this vehicle have not been classified under the European "
+                "Emission Standards band rating, or its classification is not known to the DVLA"
+            )
         return f"The emissions of this vehicle fall under the {self.euro.value} band."
 
     @property
@@ -379,34 +408,48 @@ class DVLAVehicle:
     def str_emissions_co(self) -> str:
         if not self.emissions:
             return "and produces no emissions, or the DVLA is not aware of its emissions rating"
-        return f"and produces emissions of {self.emissions}g of carbon dioxide (CO2) per " \
-               f"kilometre driven"
+        return (
+            f"and produces emissions of {self.emissions}g of carbon dioxide (CO2) per "
+            f"kilometre driven"
+        )
 
     @property
     def str_emissions_real(self) -> str:
         if not self.emissions_real:
-            return "Its real driving emissions, if different, are not known to the DVLA."
+            return (
+                "Its real driving emissions, if different, are not known to the DVLA."
+            )
         return f"It has real driving emissions of {self.emissions_real} grams per kilometre."
 
     @property
     def str_tax(self) -> str:
         if self.taxed == "SORN":
-            return "Vehicle is registered for off-road use only, or is otherwise not able to use " \
-                   "normal roads, and has a SORN (Statutory off-road notice) registered against it."
-        return f"Vehicle is {'not ' if not self.taxed else ''}currently taxed. " \
-               f"Tax expire{'s' if self.taxed else 'd'} on " \
-               f"{self.tax_due_year}/{self.tax_due_month}/{self.tax_due_day}" \
-               f"Additional tax rate " \
-               f"{'is not known' if self.art_end_date is None else 'ends on '+self.art_end_date}"
+            return (
+                "Vehicle is registered for off-road use only, or is otherwise not able to use "
+                "normal roads, and has a SORN (Statutory off-road notice) registered against it."
+            )
+        return (
+            f"Vehicle is {'not ' if not self.taxed else ''}currently taxed. "
+            f"Tax expire{'s' if self.taxed else 'd'} on "
+            f"{self.tax_due_year}/{self.tax_due_month}/{self.tax_due_day}"
+            f"Additional tax rate "
+            f"{'is not known' if self.art_end_date is None else 'ends on '+self.art_end_date}"
+        )
 
     @property
     def str_mot(self) -> str:
-        return f"Vehicle MOT {'is valid until' if self.moted else 'expired on'} " \
-               f"{self.mot_until_year}/{self.mot_until_month}/{self.mot_until_day}."
+        return (
+            f"Vehicle MOT {'is valid until' if self.moted else 'expired on'} "
+            f"{self.mot_until_year}/{self.mot_until_month}/{self.mot_until_day}."
+        )
 
     @property
     def str_vfivec(self) -> str:
         if not self.vfivec:
-            return "Vehicle does not have a logbook (V5C) or it is not known to the DVLA."
-        return f"Vehicle logbook (V5C) was last issued " \
-               f"{self.vfivec_year}/{self.vfivec_month}/{self.vfivec_day}."
+            return (
+                "Vehicle does not have a logbook (V5C) or it is not known to the DVLA."
+            )
+        return (
+            f"Vehicle logbook (V5C) was last issued "
+            f"{self.vfivec_year}/{self.vfivec_month}/{self.vfivec_day}."
+        )
