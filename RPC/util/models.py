@@ -2,21 +2,263 @@ from enum import Enum, auto
 
 from RPC.util.coercion import coerce_type
 
+# Hacky way of making manufacturer names less nasty
+acronym_mfrs = (
+    "A.S.A",
+    "A.S.A.",
+    "A.T.S",
+    "A.T.S.",
+    "AAD",
+    "AC",
+    "ACE EV",
+    "ACE",
+    "AEC",
+    "AGA",
+    "AGF",
+    "AIL",
+    "AIM",
+    "AJS",
+    "AJW",
+    "AKT",
+    "AM",
+    "AMC",
+    "AMZ",
+    "API",
+    "APIS",
+    "ARO",
+    "ASA",
+    "ATS",
+    "AVANI",
+    "AWS",
+    "AWZ",
+    "BAC",
+    "BAIC",
+    "BAW",
+    "BET",
+    "BIOMAN",
+    "BMC",
+    "BMTF",
+    "BMW",
+    "BYD",
+    "CASAL",
+    "CMC",
+    "CNA",
+    "CNHTC",
+    "CT&T",
+    "CTR",
+    "CTT",
+    "CWS",
+    "CZ",
+    "DAF",
+    "DFM",
+    "DIM",
+    "DINA",
+    "DKW",
+    "DOK-ING",
+    "DOT",
+    "DYL",
+    "E-Z-GO",
+    "ELVO",
+    "EMW",
+    "ENC",
+    "ESO",
+    "EVX",
+    "EZ-GO",
+    "EZGO",
+    "F.L.A.G",
+    "F.L.A.G.",
+    "FAMEL",
+    "FAP",
+    "FAS",
+    "FAW",
+    "FB",
+    "FCA",
+    "FLAG",
+    "FN",
+    "FNM",
+    "FNSS",
+    "FPV",
+    "FSC",
+    "FSM",
+    "FSO",
+    "FSR",
+    "GAC",
+    "GAZ",
+    "GEM",
+    "GKD",
+    "GLM",
+    "GM",
+    "GMC",
+    "GMSV",
+    "GMZ",
+    "GTA",
+    "HRD",
+    "HTT",
+    "IAME",
+    "IAVA",
+    "ICML",
+    "IDA",
+    "IKA",
+    "IMT",
+    "IMZ",
+    "INKAS",
+    "JAC",
+    "JAP",
+    "JPX",
+    "KAL",
+    "KMZ",
+    "KR",
+    "KSU",
+    "KTM",
+    "KTX",
+    "LAZ",
+    "LIAZ",
+    "LML",
+    "LMX",
+    "MAN SE",
+    "MAN",
+    "MAS",
+    "MAVA",
+    "MAZ",
+    "MCI",
+    "MDI",
+    "MEBEA",
+    "MG",
+    "MMZ",
+    "MTT",
+    "MTX",
+    "MV",
+    "MVM",
+    "MZKT",
+    "NAG",
+    "NATI",
+    "NEVS",
+    "NSU",
+    "O.M",
+    "O.M.",
+    "O.S.C.A",
+    "O.S.C.A.",
+    "OEC",
+    "OK",
+    "OM",
+    "OSCA",
+    "PAZ",
+    "PGO",
+    "PMZ",
+    "RAESR",
+    "RAF",
+    "REO",
+    "ROMAN",
+    "S.C.A.T",
+    "S.C.A.T.",
+    "S.P.A",
+    "S.P.A.",
+    "SAIC",
+    "SAIPA",
+    "SAZ",
+    "SCAT",
+    "SCG",
+    "SEAT",
+    "SFM",
+    "SHL",
+    "SIAM",
+    "SIN",
+    "SIS",
+    "SM",
+    "SMZ",
+    "SNVI",
+    "SPA",
+    "SRT",
+    "SSC",
+    "SWM",
+    "SYM",
+    "TAC",
+    "TAM",
+    "TH!NK",
+    "TIZ",
+    "TMC",
+    "TMZ",
+    "TOGG",
+    "TVR",
+    "TVS",
+    "TWN",
+    "UAZ",
+    "UD",
+    "UMM",
+    "VAM",
+    "VDL",
+    "VLF",
+    "VPG",
+    "VUHL",
+    "W",
+    "WFM",
+    "WSK",
+    "Z",
+    "ZAZ",
+    "ZENN",
+    "ZSD",
+    "ÖAF",
+)
+
 
 class EuroStatus(Enum):
+    """
+    European Emission Standards bands
+    """
+    EURO0 = auto()
+    EUROI = auto()
+    EUROII = auto()
+    EUROIII = auto()
+    EUROIV = auto()
+    EUROV = auto()
+    EUROVI = auto()
     EURO1 = auto()
     EURO2 = auto()
     EURO3 = auto()
     EURO4 = auto()
     EURO5 = auto()
+    EURO5a = auto()
+    EURO5b = auto()
     EURO6 = auto()
+    EURO6b = auto()
+    EURO6c = auto()
+    EURO6d = auto()
+    EURO6d_temp = auto()
+    EURO7 = auto()
 
 
 class FuelType(Enum):
+    """
+    Fuel types
+    """
     Diesel = auto()
     Electricity = auto()
     Petrol = auto()
     Steam = auto()
+
+
+class IVATypeApproval(Enum):
+    """
+    Individual Vehicle Approval types
+    Not included are types C, R, S, and T (agricultural) or Non-road mobile machinery
+    """
+    L1e = "A low-powered moped or two-wheeled vehicle"
+    L2e = "A low-powered three-wheeled vehicle"
+    L3e = "A motorcycle"
+    L4e = "A motorcycle with sidecar"
+    L5e = "A motorised tricycle"
+    L6e = "A low-powered four-wheeled vehicle or light quadricycle"
+    L7e = "A heavy four-wheeled vehicle or quadricycle"
+    M1 = "A passenger vehicle"
+    M2 = "A bus or coach with at most 8 passenger seats and a maximum weight below or exactly 5t"
+    M3 = "A bus or coach with at most 8 passenger seats and a maximum weight above 5t"
+    N1 = "A light goods vehicle with maximum weight up to 3500kg"
+    N2 = "A heavy goods vehicle with maximum weight between 3.5t and 12t"
+    N3 = "A heavy goods vehicle with maximum weight above 12t"
+    O1 = "A very light trailer with maximum weight below or exactly 0.75t"
+    O2 = "A light trailer with maximum weight between 0.75t and 3.5t"
+    O3 = "A medium trailer with maximum weight between 3.5t and 10t"
+    O4 = "A heavy trailer with maximum weight above 10t"
 
 
 class DVLAVehicle:
@@ -54,6 +296,8 @@ class DVLAVehicle:
     def __init__(self, ves_response):
         self.number = ves_response["registrationNumber"].upper()
         self.manufacturer = ves_response["make"].capitalize()
+        if self.manufacturer.upper() in acronym_mfrs:
+            self.manufacturer = self.manufacturer.upper()
         self.colour = ves_response["colour"].lower()
         self.year = coerce_type(ves_response["yearOfManufacture"], int)
 
@@ -96,6 +340,7 @@ class DVLAVehicle:
     def str_basic(self) -> str:
         return f"Vehicle with registration number {self.number} is a {self.colour} {self.year} " \
                f"{self.manufacturer}, whose wheel layout is {self.layout}. " \
+               f"It consumes {self.fuel.value}. " \
                f"It was registered during the month of {self.reg_month}," \
                f"{self.reg_year}{self.str_dvlareg}. " \
                f"It is {'' if self.exportable else 'not '} marked for export. {self.str_euro}"
@@ -112,7 +357,13 @@ class DVLAVehicle:
         if not self.euro:
             return "The emissions of this vehicle have not been classified under the European " \
                    "Emission Standards band rating, or its classification is not known to the DVLA"
-        return f"The emissions of this vehicle fall under the {self.euro} band."
+        return f"The emissions of this vehicle fall under the {self.euro.value} band."
+
+    @property
+    def str_type(self) -> str:
+        if not self.type_app:
+            return ""
+        return f"Vehicle has type application {self.type_app}"
 
     @property
     def str_emissions(self) -> str:
