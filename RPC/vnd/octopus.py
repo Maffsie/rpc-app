@@ -2,16 +2,25 @@ from datetime import datetime, timedelta
 from urllib import parse
 
 from dateutil import parser
-from influxdb import InfluxDBClient
 from requests import get
 
-from RPC.util.base import Micro
+from RPC.util.helpers import Configurable
+from RPC.util.layers import WithInfluxDB, WithLogging
 
 
-class Octopussy(Micro):
+class Octopussy(WithInfluxDB, WithLogging, Configurable):
     dt_from = datetime.now() - timedelta(days=30)
     dt_to = datetime.now()
-    db: InfluxDBClient = None
+    app_config = {
+        "cron_octopus_period": int,
+        "cron_octopus_apinum": 1000,
+        "vnd_octopus_apikey": str,
+        "vnd_octopus_elecsn": str,
+        "vnd_octopus_gassn": str,
+        "vnd_octopus_gasfac": float(0),
+        "vnd_octopus_mpan": str,
+        "vnd_octopus_mprn": str,
+    }
 
     uris = {
         "electricity": [
@@ -26,14 +35,8 @@ class Octopussy(Micro):
         ],
     }
 
-    def __subinit__(self, *args, **kwargs):
-        self.db = InfluxDBClient(
-            host=self.conf.get("data_influxdb_host"),
-            port=self.conf.get("data_influxdb_port"),
-            ssl=self.conf.get("data_influxdb_tls"),
-            verify_ssl=self.conf.get("data_influxdb_tlsverify"),
-            database=self.conf.get("cron_octopus_db"),
-        )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, ctx="vnd.Octopussy", dbvar="cron_octopus_db", **kwargs)
 
     def load_series(self, uri, dt_from=None, dt_to=None, page=None):
         """
@@ -42,12 +45,11 @@ class Octopussy(Micro):
         params = {
             "period_from": dt_from if dt_from else self.dt_from,
             "period_to": dt_to if dt_to else self.dt_to,
-            "page_size": self.conf.get("cron_octopus_apinum"),
+            "page_size": self.app_config.get("cron_octopus_apinum"),
         }
         if page is not None:
             params["page"] = page
-        self.log.verbose(f"Will get {uri}")
-        resp = get(uri, params=params, auth=(self.conf.get("octopus_api_key"), ""))
+        resp = get(uri, params=params, auth=(self.app_config.get("octopus_api_key"), ""))
         resp.raise_for_status()
         res = resp.json()
         ret = res.get("results", [])
@@ -73,20 +75,20 @@ class Octopussy(Micro):
             f"SELECT time, raw_consumption FROM {series} ORDER BY time DESC LIMIT 1"
         )
         if (
-            not self.conf.get("influxdb_reset_db_contents", False)
+            not self.app_config.get("influxdb_reset_db_contents", False)
             and "series" in resp.raw
             and "values" in resp.raw["series"][0]
             and len(resp.raw["series"][0]["values"]) > 0
         ):
             dt_from = resp.raw["series"][0]["values"][0][0]
-            self.log.notice(f"Newest data for {series} from {dt_from}.")
+            self.log.info(f"Newest data for {series} from {dt_from}.")
         else:
-            if self.conf.get("influxdb_reset_db_contents", False):
-                self.log.warn(
+            if self.app_config.get("influxdb_reset_db_contents", False):
+                self.log.warning(
                     f"Resetting data for {series}, as the reset flag was set",
                 )
             else:
-                self.log.warn(
+                self.log.warning(
                     f"Unable to get last entry timestamp for {series} - resetting.",
                 )
             self.db.query(f"DROP SERIES FROM {series}")
@@ -113,7 +115,7 @@ class Octopussy(Micro):
                 "measurement": series,
                 "tags": _tags(measurement),
                 "time": measurement["interval_end"],
-                "fields": _fields(measurement, self.conf.get("cron_octopus_gasfac")),
+                "fields": _fields(measurement, self.app_config.get("cron_octopus_gasfac")),
             }
             for measurement in metrics
         ]
@@ -125,8 +127,8 @@ class Octopussy(Micro):
             self.load_series(
                 self.uris[series][0]
                 % (
-                    self.conf.get(self.uris[series][1]),
-                    self.conf.get(self.uris[series][2]),
+                    self.app_config.get(self.uris[series][1]),
+                    self.app_config.get(self.uris[series][2]),
                 ),
                 *self.load_dt(series),
             ),

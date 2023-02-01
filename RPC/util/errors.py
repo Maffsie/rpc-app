@@ -48,6 +48,11 @@ class ImageGenerationError(RPCOperationalException):
     extype = "Operational error while generating image"
 
 
+class InternalOperationalError(RPCOperationalException):
+    extype = "Error while fulfilling request"
+    hstatus = 502
+
+
 class AuthRequiredError(RPCAuthException):
     extype = "Endpoint requires authentication"
     hstatus = 401
