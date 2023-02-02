@@ -32,6 +32,7 @@ def load_conf_static(conf, errno, errdesc):
 
     for entry in conf:
         conf[entry] = load_conf_one(entry, conf[entry])
+    return conf
 
 
 class Configurable:
