@@ -34,11 +34,20 @@ def throws(*etypes):
 
 
 def validator(vfunc):
+    """Indicates the wrapped function may not be invoked without passing
+        a validation function.
+
+    vfunc: Function or other callable object which performs validation
+            against the first argument to the wrapped function. Must
+            return a boolean.
+            Raises an InvalidInputError exception if validation fails.
+    """
+
     def wrapper(func):
         @wraps(func)
         def call(*args, **kwargs):
-            if not vfunc(args[0]):
-                raise InvalidInputError(args[0])
+            if not vfunc(args[1]):
+                raise InvalidInputError(args[1])
             return func(*args, **kwargs)
 
         return call
