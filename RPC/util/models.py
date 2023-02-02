@@ -223,6 +223,21 @@ acronym_mfrs = (
     "ÖAF",
 )
 
+months = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
+}
+
 
 class EuroStatus(Enum):
     """
@@ -258,6 +273,7 @@ class FuelType(Enum):
 
     Diesel = auto()
     Electricity = auto()
+    Hybrid = "Hybrid Electric"
     Petrol = auto()
     Steam = auto()
 
@@ -268,23 +284,23 @@ class IVATypeApproval(Enum):
     Not included are types C, R, S, and T (agricultural) or Non-road mobile machinery
     """
 
-    L1e = "A low-powered moped or two-wheeled vehicle"
-    L2e = "A low-powered three-wheeled vehicle"
-    L3e = "A motorcycle"
-    L4e = "A motorcycle with sidecar"
-    L5e = "A motorised tricycle"
-    L6e = "A low-powered four-wheeled vehicle or light quadricycle"
-    L7e = "A heavy four-wheeled vehicle or quadricycle"
-    M1 = "A passenger vehicle"
-    M2 = "A bus or coach with at most 8 passenger seats and a maximum weight below or exactly 5t"
-    M3 = "A bus or coach with at most 8 passenger seats and a maximum weight above 5t"
-    N1 = "A light goods vehicle with maximum weight up to 3500kg"
-    N2 = "A heavy goods vehicle with maximum weight between 3.5t and 12t"
-    N3 = "A heavy goods vehicle with maximum weight above 12t"
-    O1 = "A very light trailer with maximum weight below or exactly 0.75t"
-    O2 = "A light trailer with maximum weight between 0.75t and 3.5t"
-    O3 = "A medium trailer with maximum weight between 3.5t and 10t"
-    O4 = "A heavy trailer with maximum weight above 10t"
+    L1e = "a low-powered moped or two-wheeled vehicle"
+    L2e = "a low-powered three-wheeled vehicle"
+    L3e = "a motorcycle"
+    L4e = "a motorcycle with sidecar"
+    L5e = "a motorised tricycle"
+    L6e = "a low-powered four-wheeled vehicle or light quadricycle"
+    L7e = "a heavy four-wheeled vehicle or quadricycle"
+    M1 = "a passenger vehicle"
+    M2 = "a bus or coach with at most 8 passenger seats and a maximum weight below or exactly 5t"
+    M3 = "a bus or coach with at most 8 passenger seats and a maximum weight above 5t"
+    N1 = "a light goods vehicle with maximum weight up to 3500kg"
+    N2 = "a heavy goods vehicle with maximum weight between 3.5t and 12t"
+    N3 = "a heavy goods vehicle with maximum weight above 12t"
+    O1 = "a very light trailer with maximum weight below or exactly 0.75t"
+    O2 = "a light trailer with maximum weight between 0.75t and 3.5t"
+    O3 = "a medium trailer with maximum weight between 3.5t and 10t"
+    O4 = "a heavy trailer with maximum weight above 10t"
 
 
 class DVLAVehicle:
