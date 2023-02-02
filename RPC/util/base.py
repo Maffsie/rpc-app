@@ -9,14 +9,11 @@ from .helpers import Configurable
 from .log import Logger, LogLevel
 
 
+# TODO: 'acl' object
 class Base(Configurable):
-    init = 0
-
     def __init__(self, correlation_id: Union[UUID, None] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.init = 1
         self.log = Logger(correlation_id=correlation_id)
-        self.init = 2
 
 
 class Micro:

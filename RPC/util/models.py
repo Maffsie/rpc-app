@@ -501,3 +501,9 @@ class DVLAVehicle:
             f"Vehicle logbook (V5C) was last issued "
             f"{self.vfivec_year}/{self.vfivec_month}/{self.vfivec_day}."
         )
+
+
+class RPCGrantType(Enum):
+    DVLALookup = auto()
+    TelegramImageGeneration = auto()
+

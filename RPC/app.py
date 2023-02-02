@@ -5,12 +5,9 @@ from RPC.util.base import Base
 
 class RPCApp(Base, Flask):
     # TODO: Configuration should have SAML or OAuth2/OIDC params for authenticated requests
-    # TODO: literally already hate this
     app_config = {
         "debug": False,
         "base_uri": str,
-        "auth_aud": str,
-        "auth_iss": str,
         "vnd_tailscale_apikey": str,
         "vnd_tailscale_tailnet": str,
         "vnd_tailscale_tag": str,

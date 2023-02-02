@@ -1,8 +1,9 @@
 from functools import wraps
 
-from flask import Response, current_app
+from flask import Response, current_app, request
 
-from RPC.util.errors import InvalidInputError, RPCException
+from RPC.util.errors import AuthRequiredError, InvalidInputError, RPCException
+from RPC.util.models import RPCGrantType
 
 
 def throws(*etypes):
@@ -53,3 +54,22 @@ def validator(vfunc):
         return call
 
     return wrapper
+
+
+def require_token(grant: RPCGrantType = None):
+    """Indicates the wrapped function may not be invoked without passing
+        caller token checks.
+    """
+
+    def wrapper(func):
+        @wraps(func):
+            def call(*args, **kwargs):
+                hkey = request.headers.get("x-api-key", None)
+                if hkey is None:
+                    raise AuthRequiredError("Endpoint requires x-api-key")
+                # Raises AuthExpiredError, AuthInsufficientError & AuthInvalidError
+                current_app.acl.validate(hkey, with_grant=grant)
+                return func(*args, **kwargs)
+            return call
+        return wrapper
+
