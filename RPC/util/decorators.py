@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import Response
+from flask import Response, current_app
 
 from RPC.util.errors import InvalidInputError, RPCException
 
@@ -21,6 +21,12 @@ def throws(*etypes):
                 if not isinstance(e, RPCException):
                     return Response(response=f"Unknown exception {e}", status=503)
                 return Response(status=e.hstatus, response=str(e))
+            except Exception as e:
+                try:
+                    current_app.log.error(f"UNHANDLED EXCEPTION, THIS IS A BUG: {e}")
+                except RuntimeError:
+                    print(f"UNHANDLED EXCEPTION RUNNING OUTSIDE OF FLASK, THIS IS A BUG: {e}")
+                raise e
 
         return call
 
