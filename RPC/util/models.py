@@ -316,9 +316,11 @@ class DVLAVehicle:
     euro: EuroStatus = None
     reg_month: int = None
     reg_year: int = None
+    dvla_reg: str = None
     dvla_reg_month: int = None
     dvla_reg_year: int = None
     exportable: bool = None
+    vfivec: str = None
     vfivec_day: int = None
     vfivec_month: int = None
     vfivec_year: int = None
@@ -334,6 +336,7 @@ class DVLAVehicle:
     weight_rev: int = None
     autonomous: bool = None
     type_app: str = None
+    type_app_d: str = None
 
     def __init__(self, ves_response):
         self.number = ves_response["registrationNumber"].upper()
@@ -345,68 +348,74 @@ class DVLAVehicle:
 
         self.layout = ves_response["wheelplan"].lower()
 
-        self.fuel = coerce_type(ves_response["fuelType"], FuelType)
-        self.capacity = coerce_type(ves_response["engineCapacity"], int)
-        self.weight_rev = coerce_type(ves_response["revenueWeight"], int)
-        self.autonomous = coerce_type(ves_response["automatedVehicle"], bool)
+        self.fuel = coerce_type(ves_response.get("fuelType", None), FuelType)
+        self.capacity = coerce_type(ves_response.get("engineCapacity", None), int)
+        self.weight_rev = coerce_type(ves_response.get("revenueWeight", None), int)
+        self.autonomous = coerce_type(ves_response.get("automatedVehicle", None), bool)
 
-        self.emissions = coerce_type(ves_response["co2Emissions"], int)
-        self.emissions_real = coerce_type(ves_response["realDrivingEmissions"], int)
-        self.euro = coerce_type(ves_response["euroStatus"], EuroStatus)
-        self.type_app = ves_response["typeApproval"].upper()
+        self.emissions = coerce_type(ves_response.get("co2Emissions", None), int)
+        self.emissions_real = coerce_type(ves_response.get("realDrivingEmissions", None), int)
+        self.euro = coerce_type(ves_response.get("euroStatus", None), EuroStatus)
+        self.type_app = ves_response.get("typeApproval", "").upper()
+        self.type_app_d = coerce_type(self.type_app, IVATypeApproval)
 
-        self.reg_year = coerce_type(
-            ves_response["monthOfFirstRegistration"].split("-")[0], int
-        )
-        self.reg_month = coerce_type(
-            ves_response["monthOfFirstRegistration"].split("-")[1], int
-        )
-        self.dvla_reg = ves_response["monthOfFirstDvlaRegistration"]
-        self.dvla_reg_year = coerce_type(
-            ves_response["monthOfFirstDvlaRegistration"].split("-")[0], int
-        )
-        self.dvla_reg_month = coerce_type(
-            ves_response["monthOfFirstDvlaRegistration"].split("-")[1], int
-        )
-        self.exportable = coerce_type(ves_response["markedForExport"], bool)
+        if ves_response.get("monthOfFirstRegistration", None) is not None:
+            self.reg_year = coerce_type(
+                ves_response["monthOfFirstRegistration"].split("-")[0], int
+            )
+            self.reg_month = coerce_type(
+                ves_response["monthOfFirstRegistration"].split("-")[1], int
+            )
+        self.dvla_reg = ves_response.get("monthOfFirstDvlaRegistration", None)
+        if self.dvla_reg is not None:
+            self.dvla_reg_year = coerce_type(
+                ves_response["monthOfFirstDvlaRegistration"].split("-")[0], int
+            )
+            self.dvla_reg_month = coerce_type(
+                ves_response["monthOfFirstDvlaRegistration"].split("-")[1], int
+            )
+        self.exportable = coerce_type(ves_response.get("markedForExport", None), bool)
 
-        self.vfivec = ves_response["dateOfLastV5CIssued"]
-        self.vfivec_year = coerce_type(
-            ves_response["dateOfLastV5CIssued"].split("-")[0], int
-        )
-        self.vfivec_month = coerce_type(
-            ves_response["dateOfLastV5CIssued"].split("-")[1], int
-        )
-        self.vfivec_day = coerce_type(
-            ves_response["dateOfLastV5CIssued"].split("-")[2], int
-        )
+        self.vfivec = ves_response.get("dateOfLastV5CIssued", None)
+        if self.vfivec is not None:
+            self.vfivec_year = coerce_type(
+                ves_response["dateOfLastV5CIssued"].split("-")[0], int
+            )
+            self.vfivec_month = coerce_type(
+                ves_response["dateOfLastV5CIssued"].split("-")[1], int
+            )
+            self.vfivec_day = coerce_type(
+                ves_response["dateOfLastV5CIssued"].split("-")[2], int
+            )
 
-        self.taxed = coerce_type(ves_response["taxStatus"], bool)
-        self.tax_due_year = coerce_type(ves_response["taxDueDate"].split("-")[0], int)
-        self.tax_due_month = coerce_type(ves_response["taxDueDate"].split("-")[1], int)
-        self.tax_due_day = coerce_type(ves_response["taxDueDate"].split("-")[2], int)
-        self.art_end_date = ves_response["artEndDate"]
+        self.taxed = coerce_type(ves_response.get("taxStatus", None), bool)
+        if self.taxed is not None:
+            self.tax_due_year = coerce_type(ves_response["taxDueDate"].split("-")[0], int)
+            self.tax_due_month = coerce_type(ves_response["taxDueDate"].split("-")[1], int)
+            self.tax_due_day = coerce_type(ves_response["taxDueDate"].split("-")[2], int)
+        self.art_end_date = ves_response.get("artEndDate", None)
 
-        self.moted = coerce_type(ves_response["motStatus"], bool)
-        self.mot_until_year = coerce_type(
-            ves_response["motExpiryDate"].split("-")[0], int
-        )
-        self.mot_until_month = coerce_type(
-            ves_response["motExpiryDate"].split("-")[1], int
-        )
-        self.mot_until_day = coerce_type(
-            ves_response["motExpiryDate"].split("-")[2], int
-        )
+        self.moted = coerce_type(ves_response.get("motStatus", None), bool)
+        if self.moted is not None:
+            self.mot_until_year = coerce_type(
+                ves_response["motExpiryDate"].split("-")[0], int
+            )
+            self.mot_until_month = coerce_type(
+                ves_response["motExpiryDate"].split("-")[1], int
+            )
+            self.mot_until_day = coerce_type(
+                ves_response["motExpiryDate"].split("-")[2], int
+            )
 
     @property
     def str_basic(self) -> str:
         return (
             f"Vehicle with registration number {self.number} is a {self.colour} {self.year} "
             f"{self.manufacturer}, whose wheel layout is {self.layout}. "
-            f"It consumes {self.fuel.value}. "
-            f"It was registered during the month of {self.reg_month},"
+            f"It consumes {self.fuel.name}. "
+            f"It was registered during the month of {months[self.reg_month]}, "
             f"{self.reg_year}{self.str_dvlareg}. "
-            f"It is {'' if self.exportable else 'not '} marked for export. {self.str_euro}"
+            f"It is {'' if self.exportable else 'not '}marked for export. {self.str_euro}"
         )
 
     @property
@@ -431,7 +440,7 @@ class DVLAVehicle:
     def str_type(self) -> str:
         if not self.type_app:
             return ""
-        return f"Vehicle has type application {self.type_app}"
+        return f"Vehicle has type approval {self.type_app}, which defines it as {self.type_app_d.value.lower()}"
 
     @property
     def str_emissions(self) -> str:
