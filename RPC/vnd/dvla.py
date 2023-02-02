@@ -10,7 +10,7 @@ from RPC.util.models import DVLAVehicle
 v_regnum = compile("^[a-np-zA-NP-Z0-9]+$")
 
 
-class Doovla(IApi, WithLogging, Configurable):
+class Doovla(Configurable, WithLogging, IApi):
     app_config = {
         "doovla_api_key": str,
         "doovla_api_endpoint": "https://driver-vehicle-licensing.api.gov.uk",
@@ -26,12 +26,12 @@ class Doovla(IApi, WithLogging, Configurable):
         self.headers["x-api-key"] = self.app_config.get("doovla_api_key")
 
     @throws(InvalidInputError, InternalOperationalError)
-    @validator(lambda x: v_regnum.match(x))
+    @validator(lambda x: v_regnum.match(x) is not None)
     def lookup(self, reg: str) -> DVLAVehicle | str:
         try:
             resp = self.post(
                 "vehicle-enquiry/v1/vehicles",
-                data={
+                json={
                     "registrationNumber": reg,
                 },
             )
