@@ -61,6 +61,9 @@ def validator(vfunc):
 def require_token(grant: RPCGrantType = None):
     """Indicates the wrapped function may not be invoked without passing
     caller token checks.
+
+    grant: RPCGrantType | None: Optional parameter indicating the token is expected to have the
+                                    given grant type
     """
 
     def wrapper(func):
