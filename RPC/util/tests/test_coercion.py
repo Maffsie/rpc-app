@@ -2,7 +2,7 @@ from enum import Enum
 
 import pytest
 
-from RPC.util import coerce_type
+from RPC.util.coercion import coerce_type
 
 
 def test_coercion_basic():

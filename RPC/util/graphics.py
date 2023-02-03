@@ -6,7 +6,7 @@ from PIL import ImageColor as ImageColour
 from PIL import ImageDraw, ImageFont
 from PIL.ImageFont import FreeTypeFont
 
-from .errors import ImageGenerationError
+from RPC.util.errors import ImageGenerationError
 
 
 def wrap_text(

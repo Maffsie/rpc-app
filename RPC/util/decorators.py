@@ -26,7 +26,9 @@ def throws(*etypes):
                 try:
                     current_app.log.error(f"UNHANDLED EXCEPTION, THIS IS A BUG: {e}")
                 except RuntimeError:
-                    print(f"UNHANDLED EXCEPTION RUNNING OUTSIDE OF FLASK, THIS IS A BUG: {e}")
+                    print(
+                        f"UNHANDLED EXCEPTION RUNNING OUTSIDE OF FLASK, THIS IS A BUG: {e}"
+                    )
                 raise e
 
         return call
@@ -58,18 +60,19 @@ def validator(vfunc):
 
 def require_token(grant: RPCGrantType = None):
     """Indicates the wrapped function may not be invoked without passing
-        caller token checks.
+    caller token checks.
     """
 
     def wrapper(func):
-        @wraps(func):
-            def call(*args, **kwargs):
-                hkey = request.headers.get("x-api-key", None)
-                if hkey is None:
-                    raise AuthRequiredError("Endpoint requires x-api-key")
-                # Raises AuthExpiredError, AuthInsufficientError & AuthInvalidError
-                current_app.acl.validate(hkey, with_grant=grant)
-                return func(*args, **kwargs)
-            return call
-        return wrapper
+        @wraps(func)
+        def call(*args, **kwargs):
+            hkey = request.headers.get("x-api-key", None)
+            if hkey is None:
+                raise AuthRequiredError("Endpoint requires x-api-key")
+            # Raises AuthExpiredError, AuthInsufficientError & AuthInvalidError
+            current_app.acl.validate(hkey, with_grant=grant)
+            return func(*args, **kwargs)
 
+        return call
+
+    return wrapper

@@ -1,4 +1,4 @@
-from flask import jsonify, current_app
+from flask import current_app
 
 from RPC.util.base import Api
 from RPC.util.decorators import require_token
@@ -12,7 +12,6 @@ routes = Api()
 def reg_lookup(reg: str):
     result = current_app.providers["dvla"].lookup(reg)
     return (
-        result.str_basic
+        result.str_basic,
         200,
     )
-

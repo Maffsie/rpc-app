@@ -1,8 +1,8 @@
 import builtins
 from enum import Enum
-from typing import Any, TypeVar, Union
+from typing import Any, TypeVar
 
-from .errors import InvalidInputError
+from RPC.util.errors import InvalidInputError
 
 T = TypeVar("T")
 
@@ -33,6 +33,7 @@ TRUEABLE_WORDS = [
     "t",
     "valid",
     "yeah",
+    "yea",
     "yes",
     "y",
 ]
@@ -58,7 +59,8 @@ def coerce_type(have: Any, want: T, need: bool = False) -> T | None:
         need (bool, optional): _description_. Defaults to False.
 
     Returns:
-        Union[T, None]: _description_
+        T | None: Returns either the input (have) coerced to type T (want)
+                    or, if T is not directly a type, returns T.
     """
 
     def _coerce(have: Any, want: T, need: bool) -> T | None:

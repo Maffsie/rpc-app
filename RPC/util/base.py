@@ -1,17 +1,14 @@
 import inspect
-from os import environ as env
-from typing import Union
 from uuid import UUID
 
 from flask import Blueprint
 
-from .helpers import Configurable
-from .log import Logger, LogLevel
+from RPC.util.helpers import Configurable
+from RPC.util.log import Logger
 
 
-# TODO: 'acl' object
 class Base(Configurable):
-    def __init__(self, correlation_id: Union[UUID, None] = None, *args, **kwargs):
+    def __init__(self, correlation_id: UUID | None = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.log = Logger(correlation_id=correlation_id)
 
@@ -23,7 +20,7 @@ class Micro:
     def __init__(
         self,
         conf: dict,
-        correlation_id: Union[UUID, None] = None,
+        correlation_id: UUID | None = None,
         logger: Logger = None,
         *args,
         **kwargs,

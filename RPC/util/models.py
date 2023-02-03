@@ -354,7 +354,9 @@ class DVLAVehicle:
         self.autonomous = coerce_type(ves_response.get("automatedVehicle", None), bool)
 
         self.emissions = coerce_type(ves_response.get("co2Emissions", None), int)
-        self.emissions_real = coerce_type(ves_response.get("realDrivingEmissions", None), int)
+        self.emissions_real = coerce_type(
+            ves_response.get("realDrivingEmissions", None), int
+        )
         self.euro = coerce_type(ves_response.get("euroStatus", None), EuroStatus)
         self.type_app = ves_response.get("typeApproval", "").upper()
         self.type_app_d = coerce_type(self.type_app, IVATypeApproval)
@@ -390,9 +392,15 @@ class DVLAVehicle:
 
         self.taxed = coerce_type(ves_response.get("taxStatus", None), bool)
         if self.taxed is not None:
-            self.tax_due_year = coerce_type(ves_response["taxDueDate"].split("-")[0], int)
-            self.tax_due_month = coerce_type(ves_response["taxDueDate"].split("-")[1], int)
-            self.tax_due_day = coerce_type(ves_response["taxDueDate"].split("-")[2], int)
+            self.tax_due_year = coerce_type(
+                ves_response["taxDueDate"].split("-")[0], int
+            )
+            self.tax_due_month = coerce_type(
+                ves_response["taxDueDate"].split("-")[1], int
+            )
+            self.tax_due_day = coerce_type(
+                ves_response["taxDueDate"].split("-")[2], int
+            )
         self.art_end_date = ves_response.get("artEndDate", None)
 
         self.moted = coerce_type(ves_response.get("motStatus", None), bool)
@@ -506,4 +514,3 @@ class DVLAVehicle:
 class RPCGrantType(Enum):
     DVLALookup = auto()
     TelegramImageGeneration = auto()
-

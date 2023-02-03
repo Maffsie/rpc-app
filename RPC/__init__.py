@@ -1,10 +1,10 @@
-from .app import RPCApp
+from RPC.app import RPCApp
 
 
 def create_app():
     rpc = RPCApp(__name__)
 
-    from RPC.Unversioned import api as v0
+    from RPC.v0 import api as v0
     from RPC.v1 import api as v1
     from RPC.v2 import api as v2
 

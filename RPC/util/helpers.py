@@ -1,8 +1,8 @@
 from os import environ as env
 from warnings import warn
 
-from .coercion import coerce_type
-from .conf import preconfigure
+from RPC.util.coercion import coerce_type
+from RPC.util.conf import preconfigure
 
 
 def load_conf_static(conf, errno, errdesc):
