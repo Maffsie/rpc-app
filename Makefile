@@ -212,4 +212,9 @@ docker-build-x64:
 arm64deploy:
 	ssh $(ARM64USR)@$(ARM64HOST) docker service update --force --image $(GITEA_TAG):latest-aarch64 $(SWARM_SVC)
 
+.PHONY: 386dev
+386dev: docker-build
+	docker run --rm -it --user root -v $(SRCPATH):/app/RPC -v ./Pipfile:/app/Pipfile -v ./Pipfile.lock:/app/Pipfile.lock $(GITEA_TAG):latest-$(ARCH) /bin/sh
+
+
 localtest: format gitcommit gitpush docker-build-aarch64 arm64deploy
