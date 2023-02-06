@@ -2,6 +2,7 @@ import inspect
 from uuid import UUID
 
 from flask import Blueprint
+from requests import Session
 
 from RPC.util.helpers import Configurable
 from RPC.util.log import Logger
@@ -62,3 +63,20 @@ class Api(Blueprint):
 
     def include(self, *args):
         [self.register_blueprint(api) for api in args]
+
+
+class IApi(Session):
+    """
+    Base class for API implementations.
+    Expects the `baseurl` string to be overridden.
+    Expects all requests to be relative to the `baseurl`.
+    """
+    baseurl: str = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def request(self, method, url, *args, **kwargs):
+        return super().request(
+            method=method, url=f"{self.baseurl}/{url}", *args, **kwargs
+        )
