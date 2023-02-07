@@ -24,8 +24,9 @@ class BaseAuth(Configurable):
 
     @property
     def token(self) -> str:
+        # Expected format: Bearer [a-zA-Z0-9\.]+
         hreq = self.auth_header
-        if hreq[1] != " " or hreq[0] not in self.accepted_auth_types:
+        if hreq[1] != " " or hreq[0] not in self.accepted_auth_types or len(hreq[2]) == 0:
             raise AuthInvalidError("Auth header is not in expected format")
         return hreq[2]
 
@@ -35,8 +36,12 @@ class BearerAuth(BaseAuth):
     BearerAuth - a module for providing call-layer authentication.
     Provides the ability to authenticate an API key, and validating it has the correct grants.
     """
-
-    pass
+    @property
+    def token(self) -> str:
+        hreq = super().token.split(".")
+        if len(hreq) not in (1, 2,):
+            raise AuthInvalidError("Auth header is not in a known Bearer format")
+        return hreq[0]
 
 
 class JWTAuth(BaseAuth):
