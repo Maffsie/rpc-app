@@ -14,6 +14,7 @@ class BaseAuth(Configurable):
     accepted_auth_types = [
         "Bearer",
     ]
+
     @property
     def auth_header(self) -> (str, str, str):
         if "authorisation" in request.headers.keys(True):
@@ -26,7 +27,11 @@ class BaseAuth(Configurable):
     def token(self) -> str:
         # Expected format: Bearer [a-zA-Z0-9\.]+
         hreq = self.auth_header
-        if hreq[1] != " " or hreq[0] not in self.accepted_auth_types or len(hreq[2]) == 0:
+        if (
+            hreq[1] != " "
+            or hreq[0] not in self.accepted_auth_types
+            or len(hreq[2]) == 0
+        ):
             raise AuthInvalidError("Auth header is not in expected format")
         return hreq[2]
 
@@ -36,10 +41,14 @@ class BearerAuth(BaseAuth):
     BearerAuth - a module for providing call-layer authentication.
     Provides the ability to authenticate an API key, and validating it has the correct grants.
     """
+
     @property
     def token(self) -> str:
         hreq = super().token.split(".")
-        if len(hreq) not in (1, 2,):
+        if len(hreq) not in (
+            1,
+            2,
+        ):
             raise AuthInvalidError("Auth header is not in a known Bearer format")
         return hreq[0]
 
@@ -49,6 +58,7 @@ class JWTAuth(BaseAuth):
     JWTAuth - a module for providing user authentication via JSON Web Tokens.
     Provides the ability to log in as a given user, confirm the validity of a token, etc.
     """
+
     accepted_auth_types = [
         "JWT",
     ]

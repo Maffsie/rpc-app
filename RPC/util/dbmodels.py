@@ -11,7 +11,4 @@ class RPCTokenAdapter(WithSQLiteDB):
         self.validate_schema()
 
     def validate_schema(self):
-        with self._db() as dbo:
-
-
-
+        pass

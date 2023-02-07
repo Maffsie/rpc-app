@@ -9,7 +9,9 @@ from RPC.util.helpers import load_conf_static
 class WithDBConf:
     dbo_conf = {}
 
-    def __init__(self, *args, db: str | None = None, dbvar: str | None = None, **kwargs):
+    def __init__(
+        self, *args, db: str | None = None, dbvar: str | None = None, **kwargs
+    ):
         # TODO: This is messy as fuck
         if db is None or db == "" and dbvar is not None and dbvar != "":
             self.dbo_conf[dbvar] = str
@@ -55,6 +57,7 @@ class WithLogging:
     """
     Layer to provide logging for subclasses
     """
+
     log: logging.Logger = None
 
     def __init__(self, *args, ctx: str | None = None, **kwargs):

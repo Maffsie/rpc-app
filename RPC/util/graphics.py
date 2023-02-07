@@ -148,15 +148,17 @@ def fit_text(
     return (trial_font, wrapped_text)
 
 
-def impose_text(text: str,
-                anchor: (int, int),
-                bounds: (int, int),
-                canvas: (int, int),
-                font: FreeTypeFont,
-                fg_colour: str = "black",
-                bg_colour: str = "white",
-                align: str = "center",
-                jpegfuck: bool = False) -> BytesIO:
+def impose_text(
+    text: str,
+    anchor: (int, int),
+    bounds: (int, int),
+    canvas: (int, int),
+    font: FreeTypeFont,
+    fg_colour: str = "black",
+    bg_colour: str = "white",
+    align: str = "center",
+    jpegfuck: bool = False,
+) -> BytesIO:
     buf = BytesIO()
     with Image.new("RGB", canvas, ImageColour.getrgb(bg_colour)) as imposer:
         pen = ImageDraw.Draw(imposer)
@@ -192,8 +194,18 @@ def inner_render_chad(impose: str, inline_id: int):
     text_begin_xy = (8, 305)
     text_wrap_box = (222, 202)
     calibri = ImageFont.truetype(text_font, text_font_sz)
-    jpeg_buf = impose_text(impose, text_begin_xy, text_wrap_box, canvas_sz, calibri, align="right", jpegfuck=True)
-    with Image.open(jpeg_buf) as blit, Image.open("resources/img/bases/chad.png") as base:
+    jpeg_buf = impose_text(
+        impose,
+        text_begin_xy,
+        text_wrap_box,
+        canvas_sz,
+        calibri,
+        align="right",
+        jpegfuck=True,
+    )
+    with Image.open(jpeg_buf) as blit, Image.open(
+        "resources/img/bases/chad.png"
+    ) as base:
         base.paste(ImageChops.multiply(blit, base), (0, 0))
         base.save(f"/tmp/{inline_id}_chad.jpg", "JPEG", quality=35)
         base.thumbnail(thumb_sz, Image.Resampling.BILINEAR)
@@ -217,14 +229,18 @@ def inner_render_rdj(impose: str, inline_id: int):
     text_wrap_box = (132, 180)
 
     calibri = ImageFont.truetype(text_font, text_font_sz)
-    jpeg_buf = impose_text(impose, text_begin_xy, text_wrap_box, canvas_start_sz, calibri)
+    jpeg_buf = impose_text(
+        impose, text_begin_xy, text_wrap_box, canvas_start_sz, calibri
+    )
     with Image.open(jpeg_buf) as distortfuck:
         distortfuck.resize(canvas_scalefuck_sz, Image.Resampling.NEAREST).resize(
             canvas_start_sz, Image.Resampling.BILINEAR
         ).resize(canvas_stretchbounds_sz, Image.Resampling.BILINEAR).save(
             jpeg_buf, "JPEG", quality=7
         )
-    with Image.open(jpeg_buf) as blit, Image.open("resources/img/bases/rdj.jpg") as base:
+    with Image.open(jpeg_buf) as blit, Image.open(
+        "resources/img/bases/rdj.jpg"
+    ) as base:
         base.paste(ImageChops.multiply(blit, base), (0, 0))
         base.save(f"/tmp/{inline_id}_rdj.jpg", "JPEG", quality=35)
         base.thumbnail(canvas_thumb_sz, Image.Resampling.BILINEAR)

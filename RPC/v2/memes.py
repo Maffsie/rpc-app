@@ -1,11 +1,18 @@
-from flask import current_app, request, send_file
 from pathlib import Path
+
+from flask import current_app, request, send_file
 
 from RPC.util.base import Api
 from RPC.util.coercion import coerce_type
 from RPC.util.decorators import throws
-from RPC.util.errors import DishonourableError, ImageGenerationError, InternalOperationalError, InvalidInputError, MissingFileError
-from RPC.util.graphics import render_rdj, render_chad
+from RPC.util.errors import (
+    DishonourableError,
+    ImageGenerationError,
+    InternalOperationalError,
+    InvalidInputError,
+    MissingFileError,
+)
+from RPC.util.graphics import render_chad, render_rdj
 from RPC.util.models import TelegramInlineRequest
 
 routes = Api()

@@ -71,6 +71,7 @@ class IApi(Session):
     Expects the `baseurl` string to be overridden.
     Expects all requests to be relative to the `baseurl`.
     """
+
     baseurl: str = None
 
     def __init__(self, *args, **kwargs):

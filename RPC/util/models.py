@@ -558,16 +558,18 @@ class TelegramInlineRequest:
         return True
 
     def append_response(self, urls: list[str], res: (int, int), desc: str, res_id: int):
-        self.responses.append({
-            "type": "photo",
-            "id": f"{self.inline_id}.{res_id}",
-            "photo_url": urls[0],
-            "thumb_url": urls[1],
-            "photo_width": res[0],
-            "photo_height": res[1],
-            "title": desc,
-            "description": desc,
-        })
+        self.responses.append(
+            {
+                "type": "photo",
+                "id": f"{self.inline_id}.{res_id}",
+                "photo_url": urls[0],
+                "thumb_url": urls[1],
+                "photo_width": res[0],
+                "photo_height": res[1],
+                "title": desc,
+                "description": desc,
+            }
+        )
 
     @property
     def jdict(self) -> dict:
@@ -603,7 +605,7 @@ class TelegramInlineResponsePhoto:
             "photo_width": self.result.width,
             "photo_height": self.result.height,
             "title": self.result.hname,
-            "description": self.result.hname
+            "description": self.result.hname,
         }
 
 
