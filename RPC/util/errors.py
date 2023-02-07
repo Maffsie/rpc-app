@@ -53,6 +53,11 @@ class InternalOperationalError(RPCOperationalException):
     hstatus = 502
 
 
+class DishonourableError(RPCOperationalException):
+    extype = "You are dishonourable"
+    hstatus = 403
+
+
 class AuthRequiredError(RPCAuthException):
     extype = "Endpoint requires authentication"
     hstatus = 401

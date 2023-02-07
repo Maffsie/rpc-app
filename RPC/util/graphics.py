@@ -148,7 +148,59 @@ def fit_text(
     return (trial_font, wrapped_text)
 
 
-def inner_render_rdj(impose: str, id: int):
+def impose_text(text: str,
+                anchor: (int, int),
+                bounds: (int, int),
+                canvas: (int, int),
+                font: FreeTypeFont,
+                fg_colour: str = "black",
+                bg_colour: str = "white",
+                align: str = "center",
+                jpegfuck: bool = False) -> BytesIO:
+    buf = BytesIO()
+    with Image.new("RGB", canvas, ImageColour.getrgb(bg_colour)) as imposer:
+        pen = ImageDraw.Draw(imposer)
+
+        (_, wrapped_text) = fit_text(
+            font=font,
+            text=text,
+            max_height=9999999999999999999999999999999999999999999999999,
+            max_width=bounds[0],
+            scale_factor=1.0,
+            max_iterations=1,
+            spacing=3,
+        )
+        pen.multiline_text(
+            anchor,
+            wrapped_text,
+            font=font,
+            fill=ImageColour.getrgb(fg_colour),
+            align=align,
+        )
+        if jpegfuck:
+            imposer.save(buf, "JPEG", quality=7)
+        else:
+            imposer.save(buf, "PNG")
+    return buf
+
+
+def inner_render_chad(impose: str, inline_id: int):
+    canvas_sz = (585, 525)
+    thumb_sz = (150, 150)
+    text_font = "resources/fonts/CALIBRI.TTF"
+    text_font_sz = 32
+    text_begin_xy = (8, 305)
+    text_wrap_box = (222, 202)
+    calibri = ImageFont.truetype(text_font, text_font_sz)
+    jpeg_buf = impose_text(impose, text_begin_xy, text_wrap_box, canvas_sz, calibri, align="right", jpegfuck=True)
+    with Image.open(jpeg_buf) as blit, Image.open("resources/img/bases/chad.png") as base:
+        base.paste(ImageChops.multiply(blit, base), (0, 0))
+        base.save(f"/tmp/{inline_id}_chad.jpg", "JPEG", quality=35)
+        base.thumbnail(thumb_sz, Image.Resampling.BILINEAR)
+        base.save(f"/tmp/{inline_id}_chad_t.jpg", "JPEG", quality=75)
+
+
+def inner_render_rdj(impose: str, inline_id: int):
     canvas_start_sz = (422, 677)
     canvas_stretchfuck_factor = 1.5
     canvas_scalefuck_sz = (
@@ -159,48 +211,35 @@ def inner_render_rdj(impose: str, id: int):
     canvas_thumb_sz = (150, 150)
     # canvas_final_sz = (600, 677)
 
-    text_font = "resources/CALIBRI.TTF"
+    text_font = "resources/fonts/CALIBRI.TTF"
     text_font_sz = 32
     text_begin_xy = (9, 120)
     text_wrap_box = (132, 180)
 
-    jpeg_buf = BytesIO()
-
-    with Image.new("RGB", canvas_start_sz, ImageColour.getrgb("white")) as canvas_tx:
-        calibri = ImageFont.truetype(text_font, text_font_sz)
-        pen = ImageDraw.Draw(canvas_tx)
-
-        (_, wrapped_text) = fit_text(
-            font=calibri,
-            text=impose,
-            max_height=9999999999999999999999999999999999999999999999999,
-            max_width=text_wrap_box[0],
-            scale_factor=1.0,
-            max_iterations=1,
-            spacing=3,
-        )
-        pen.multiline_text(
-            text_begin_xy,
-            wrapped_text,
-            font=calibri,
-            fill=ImageColour.getrgb("black"),
-            align="center",
-        )
-
-        canvas_tx.resize(canvas_scalefuck_sz, Image.Resampling.NEAREST).resize(
+    calibri = ImageFont.truetype(text_font, text_font_sz)
+    jpeg_buf = impose_text(impose, text_begin_xy, text_wrap_box, canvas_start_sz, calibri)
+    with Image.open(jpeg_buf) as distortfuck:
+        distortfuck.resize(canvas_scalefuck_sz, Image.Resampling.NEAREST).resize(
             canvas_start_sz, Image.Resampling.BILINEAR
         ).resize(canvas_stretchbounds_sz, Image.Resampling.BILINEAR).save(
             jpeg_buf, "JPEG", quality=7
         )
-    with Image.open(jpeg_buf) as blit, Image.open("resources/_.jpg") as base:
+    with Image.open(jpeg_buf) as blit, Image.open("resources/img/bases/rdj.jpg") as base:
         base.paste(ImageChops.multiply(blit, base), (0, 0))
-        base.save(f"/tmp/{id}.jpg", "JPEG", quality=35)
+        base.save(f"/tmp/{inline_id}_rdj.jpg", "JPEG", quality=35)
         base.thumbnail(canvas_thumb_sz, Image.Resampling.BILINEAR)
-        base.save(f"/tmp/{id}_t.jpg", "JPEG", quality=75)
+        base.save(f"/tmp/{inline_id}_rdj_t.jpg", "JPEG", quality=75)
 
 
 def render_rdj(*args, **kwargs):
     try:
         inner_render_rdj(*args, **kwargs)
+    except Exception as e:
+        raise ImageGenerationError(e)
+
+
+def render_chad(*args, **kwargs):
+    try:
+        inner_render_chad(*args, **kwargs)
     except Exception as e:
         raise ImageGenerationError(e)

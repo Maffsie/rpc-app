@@ -1,5 +1,7 @@
 from enum import Enum, auto
 
+from flask import Request
+
 from RPC.util.coercion import coerce_type
 
 # Hacky way of making manufacturer names less nasty
@@ -509,6 +511,100 @@ class DVLAVehicle:
             f"Vehicle logbook (V5C) was last issued "
             f"{self.vfivec_year}/{self.vfivec_month}/{self.vfivec_day}."
         )
+
+
+class TelegramInvocableResult:
+    url: str = None
+    width: int = None
+    height: int = None
+    hname: str = None
+
+    def __init__(self, url: str, width: int, height: int, hname: str):
+        self.url = url
+        self.width = width
+        self.height = height
+        self.hname = hname
+
+
+class TelegramInlineRequest:
+    inline_id: int = None
+    chat_id: int | None = None
+    content: str = None
+    request_type: str = None
+    from_id: int = None
+    from_bot: bool = None
+    from_uname: str | None = None
+    from_obj: dict = None
+
+    responses: list = None
+
+    def __init__(self, request: Request):
+        reqj = request.json()
+        self.inline_id = coerce_type(reqj["inlineQueryId"], int, need=True)
+        self.chat_id = coerce_type(reqj.get("chatId", None), int)
+        self.content = reqj["content"]
+        self.request_type = reqj["type"]
+        self.from_obj = reqj["from"]
+        self.from_id = coerce_type(reqj["from"]["id"], int, need=True)
+        self.from_bot = coerce_type(reqj["from"]["is_bot"], bool, need=True)
+        self.from_uname = reqj["from"]["username"]
+        self.responses = []
+
+    @property
+    def honour_request(self):
+        # No bots.
+        if self.from_bot:
+            return False
+        return True
+
+    def append_response(self, urls: list[str], res: (int, int), desc: str, res_id: int):
+        self.responses.append({
+            "type": "photo",
+            "id": f"{self.inline_id}.{res_id}",
+            "photo_url": urls[0],
+            "thumb_url": urls[1],
+            "photo_width": res[0],
+            "photo_height": res[1],
+            "title": desc,
+            "description": desc,
+        })
+
+    @property
+    def jdict(self) -> dict:
+        return {
+            "chatId": self.chat_id,
+            "type": "answerInlineQuery",
+            "content": self.content,
+            "inlineQueryId": self.inline_id,
+            "offset": "",
+            "from": {**self.from_obj},
+            "cache_time": 86400,
+            "results": self.responses,
+        }
+
+
+class TelegramInlineResponsePhoto:
+    inline_id: int = None
+    inputstr: str = None
+    result: TelegramInvocableResult = None
+
+    def __init__(self, inline_id: int, request: str, invoke: callable):
+        self.inline_id = inline_id
+        self.inputstr = request
+        self.result = invoke(request)
+
+    @property
+    def obj(self) -> dict:
+        return {
+            "type": "photo",
+            "id": f"{self.inline_id}.{self.__hash__()}",
+            "photo_url": "",
+            "thumb_url": "",
+            "photo_width": self.result.width,
+            "photo_height": self.result.height,
+            "title": self.result.hname,
+            "description": self.result.hname
+        }
 
 
 class RPCGrantType(Enum):

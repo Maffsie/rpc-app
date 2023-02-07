@@ -15,7 +15,7 @@ routes = Api()
 @throws(InvalidInputError, MissingFileError)
 def get_render():
     req_id = coerce_type(request.args.get("i", None), int, need=True)
-    fpath = Path(f"/tmp/{req_id}.jpg")
+    fpath = Path(f"/tmp/{req_id}_rdj.jpg")
     if fpath.exists() and fpath.is_file():
         return send_file(fpath)
     else:
@@ -26,7 +26,7 @@ def get_render():
 @throws(InvalidInputError, MissingFileError)
 def get_render_thumb():
     req_id = coerce_type(request.args.get("i", None), int, need=True)
-    fpath = Path(f"/tmp/{req_id}_t.jpg")
+    fpath = Path(f"/tmp/{req_id}_rdj_t.jpg")
     if fpath.exists() and fpath.is_file():
         return send_file(fpath)
     else:
