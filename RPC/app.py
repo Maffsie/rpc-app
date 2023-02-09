@@ -22,8 +22,10 @@ class RPCApp(Base, Flask):
     def setup_providers(self):
         # TODO: this should really be dynamic..
         from RPC.vnd.dvla import Doovla
+        from RPC.vnd.switchbot import Switchbot
 
         self.providers["dvla"] = Doovla()
+        self.providers["switchbot"] = Switchbot()
 
     def setup_services(self):
         # TODO: dynamic loader for services

@@ -1,10 +1,11 @@
 from json import JSONDecodeError
 from re import compile
 
+from RPC.layers import WithLogging
+from RPC.util.base import IApi
 from RPC.util.decorators import throws, validator
 from RPC.util.errors import InternalOperationalError, InvalidInputError
 from RPC.util.helpers import Configurable
-from RPC.util.layers import IApi, WithLogging
 from RPC.util.models import DVLAVehicle
 
 v_regnum = compile("^[a-np-zA-NP-Z0-9]+$")
