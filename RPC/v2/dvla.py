@@ -1,8 +1,8 @@
-from flask import current_app
+from flask import current_app, Response
 
 from RPC.util.base import Api
 from RPC.util.decorators import require_token
-from RPC.util.models import RPCGrantType
+from RPC.util.models import RPCGrantType, DVLAVehicle
 
 routes = Api()
 
@@ -20,7 +20,11 @@ def reg_lookup(reg: str):
 @routes.route("/lookup_inline/<string:reg>")
 def reg_lookup_inline(reg: str):
     result = current_app.providers["dvla"].lookup(reg)
-    return (
-        result.str_full,
-        200
-    )
+    if isinstance(result, DVLAVehicle):
+        return (
+            result.str_full,
+            200
+        )
+    if isinstance(result, Response):
+        return result
+    return result, 404
