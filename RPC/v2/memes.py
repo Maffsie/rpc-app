@@ -79,16 +79,14 @@ def inline_req():
         raise DishonourableError("fuck you :)")
     render_chad(impose=req.content, inline_id=req.inline_id, suffix=0)
     render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1)
-    prefix = f"{request.host_url}v2/{routes.url_prefix}"
-    if request.headers.get("x-forward-proto", "").lower() == "https":
-        prefix = f"https://{request.host}/v2/{routes.url_prefix}"
+    prefix = f"https://rpc.puppy.network/v2/memes/renders"
     req.append_response([
-        f"{prefix}/renders/{req.inline_id}.0",
-        f"{prefix}/renders/{req.inline_id}.0.t",
+        f"{prefix}/{req.inline_id}.0",
+        f"{prefix}/{req.inline_id}.0.t",
     ], (585, 525,), "chad", 0)
     req.append_response([
-        f"{prefix}/renders/{req.inline_id}.1",
-        f"{prefix}/renders/{req.inline_id}.1.t",
+        f"{prefix}/{req.inline_id}.1",
+        f"{prefix}/{req.inline_id}.1.t",
     ], (578, 677,), "rdj", 1)
     return req.jdict
 
