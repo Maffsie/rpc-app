@@ -247,6 +247,24 @@ def inner_render_rdj(impose: str, inline_id: int, suffix: int):
         base.save(f"/tmp/r_{inline_id}.{suffix}_t.jpg", "JPEG", quality=75)
 
 
+def inline_render_rdj(impose: str, inline_id: str, suffix: int):
+    render_rdj(impose, inline_id, suffix)
+    prefix = f"https://rpc.puppy.network/v2/memes/renders"
+    return ([
+        f"{prefix}/{inline_id}.{suffix}",
+        f"{prefix}/{inline_id}.{suffix}.t",
+    ], (677, 600,), "rdj", 0)
+
+
+def inline_render_chad(impose: str, inline_id: str, suffix: int):
+    render_chad(impose, inline_id, suffix)
+    prefix = f"https://rpc.puppy.network/v2/memes/renders"
+    return ([
+        f"{prefix}/{inline_id}.{suffix}",
+        f"{prefix}/{inline_id}.{suffix}.t",
+    ], (585, 525,), "chad", 0)
+
+
 def render_rdj(*args, **kwargs):
     try:
         inner_render_rdj(*args, **kwargs)

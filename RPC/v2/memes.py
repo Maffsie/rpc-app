@@ -12,7 +12,7 @@ from RPC.util.errors import (
     InvalidInputError,
     MissingFileError,
 )
-from RPC.util.graphics import render_chad, render_rdj
+from RPC.util.graphics import inline_render_chad, inline_render_rdj
 from RPC.util.models import TelegramInlineRequest
 
 routes = Api()
@@ -77,42 +77,9 @@ def inline_req():
         raise InternalOperationalError(f"something went wrong: {e}")
     if not req.honour_request:
         raise DishonourableError("fuck you :)")
-    render_chad(impose=req.content, inline_id=req.inline_id, suffix=0)
-    render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1)
-    prefix = f"https://rpc.puppy.network/v2/memes/renders"
-    req.append_response([
-        f"{prefix}/{req.inline_id}.0",
-        f"{prefix}/{req.inline_id}.0.t",
-    ], (585, 525,), "chad", 0)
-    req.append_response([
-        f"{prefix}/{req.inline_id}.1",
-        f"{prefix}/{req.inline_id}.1.t",
-    ], (677, 600,), "rdj", 1)
+    req.append_response(*inline_render_chad(impose=req.content, inline_id=req.inline_id, suffix=0))
+    req.append_response(*inline_render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1))
     return req.jdict
-
-
-@routes.route("/render/rdj")
-@throws(ImageGenerationError, InvalidInputError)
-def req_rdj():
-    impose = request.args.get("s", "type something already")
-    inline_id = coerce_type(request.args.get("i", None), int, need=True)
-    render_rdj(impose=impose, inline_id=inline_id, suffix=0)
-    return [
-        f"{routes.url_prefix}/renders/{inline_id}.0",
-        f"{routes.url_prefix}/renders/{inline_id}.0.t",
-    ]
-
-
-@routes.route("/render/chad")
-@throws(ImageGenerationError, InvalidInputError)
-def req_chad():
-    impose = request.args.get("s", None)
-    inline_id = coerce_type(request.args.get("i", None), int, need=True)
-    render_chad(impose=impose, inline_id=inline_id, suffix=0)
-    return [
-        f"{routes.url_prefix}/renders/{inline_id}.0",
-        f"{routes.url_prefix}/renders/{inline_id}.0.t",
-    ]
 
 
 @routes.route("/renders/<int:inline_id>.<int:suffix>.t")
