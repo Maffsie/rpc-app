@@ -5,6 +5,14 @@ from RPC.util.base import Api
 routes = Api()
 
 
+@routes.route("/devices")
+def devicelist():
+    return (
+        current_app.providers["switchbot"].devices(),
+        200,
+    )
+
+
 @routes.route("/scenes")
 def scenelist():
     return (

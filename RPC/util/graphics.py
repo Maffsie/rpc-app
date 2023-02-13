@@ -207,9 +207,9 @@ def inner_render_chad(impose: str, inline_id: int):
         "resources/img/bases/chad.png"
     ) as base:
         base.paste(ImageChops.multiply(blit, base), (0, 0))
-        base.save(f"/tmp/{inline_id}_chad.jpg", "JPEG", quality=35)
+        base.save(f"/tmp/r_{inline_id}.jpg", "JPEG", quality=35)
         base.thumbnail(thumb_sz, Image.Resampling.BILINEAR)
-        base.save(f"/tmp/{inline_id}_chad_t.jpg", "JPEG", quality=75)
+        base.save(f"/tmp/r_{inline_id}_t.jpg", "JPEG", quality=75)
 
 
 def inner_render_rdj(impose: str, inline_id: int):
@@ -242,9 +242,9 @@ def inner_render_rdj(impose: str, inline_id: int):
         "resources/img/bases/rdj.jpg"
     ) as base:
         base.paste(ImageChops.multiply(blit, base), (0, 0))
-        base.save(f"/tmp/{inline_id}_rdj.jpg", "JPEG", quality=35)
+        base.save(f"/tmp/r_{inline_id}.jpg", "JPEG", quality=35)
         base.thumbnail(canvas_thumb_sz, Image.Resampling.BILINEAR)
-        base.save(f"/tmp/{inline_id}_rdj_t.jpg", "JPEG", quality=75)
+        base.save(f"/tmp/r_{inline_id}_t.jpg", "JPEG", quality=75)
 
 
 def render_rdj(*args, **kwargs):
