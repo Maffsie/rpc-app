@@ -87,7 +87,7 @@ def inline_req():
     req.append_response([
         f"{prefix}/{req.inline_id}.1",
         f"{prefix}/{req.inline_id}.1.t",
-    ], (578, 677,), "rdj", 1)
+    ], (677, 600,), "rdj", 1)
     return req.jdict
 
 
