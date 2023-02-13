@@ -21,6 +21,6 @@ def reg_lookup(reg: str):
 def reg_lookup_inline(reg: str):
     result = current_app.providers["dvla"].lookup(reg)
     return (
-        result.str_basic,
+        result.str_full,
         200
     )

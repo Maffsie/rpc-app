@@ -418,6 +418,21 @@ class DVLAVehicle:
             )
 
     @property
+    def str_full(self) -> str:
+        return (
+            "*Basic information*\n"
+            f"Vehicle with registration number {self.number} is a {self.colour} {self.year} "
+            f"{self.manufacturer}, whose wheel layout is {self.layout}.\n"
+            f"It has a {self.fuel.name} engine, and was registered during the month of "
+            f"{months[self.reg_month]}, {self.reg_year}{self.str_dvlareg}."
+            f"It is {'' if self.exportable else 'not '}marked for export. {self.str_type}\n\n"
+            "*Tax and MOT*\n"
+            f"{self.str_tax}\n{self.str_mot}\n{self.str_vfivec}\n\n"
+            "*Emissions & classification*\n"
+            f"{self.str_emissions} {self.str_euro}."
+        )
+
+    @property
     def str_basic(self) -> str:
         return (
             f"Vehicle with registration number {self.number} is a {self.colour} {self.year} "
@@ -449,8 +464,8 @@ class DVLAVehicle:
     @property
     def str_type(self) -> str:
         if not self.type_app:
-            return ""
-        return f"Vehicle has type approval {self.type_app}, which defines it as {self.type_app_d.value.lower()}"
+            return "Vehicle has no registered type approval."
+        return f"Vehicle has type approval {self.type_app}, which defines it as {self.type_app_d.value.lower()}."
 
     @property
     def str_emissions(self) -> str:
@@ -491,7 +506,7 @@ class DVLAVehicle:
             f"Tax expire{'s' if self.taxed else 'd'} on "
             f"{self.tax_due_year}/{self.tax_due_month}/{self.tax_due_day}"
             f"Additional tax rate "
-            f"{'is not known' if self.art_end_date is None else 'ends on '+self.art_end_date}"
+            f"{'information is not known' if self.art_end_date is None else 'ends on '+self.art_end_date}"
         )
 
     @property
