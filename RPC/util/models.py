@@ -424,12 +424,12 @@ class DVLAVehicle:
             f"Vehicle with registration number *{self.number}* is a *{self.colour} {self.year} "
             f"{self.manufacturer}*, whose wheel layout is *{self.layout}*.\n"
             f"It has a {self.fuel.name} engine, and was registered during the month of "
-            f"{months[self.reg_month]}, {self.reg_year}{self.str_dvlareg}."
+            f"{months[self.reg_month]}, {self.reg_year}{self.str_dvlareg}. "
             f"It is {'' if self.exportable else 'not '}marked for export. {self.str_type}\n\n"
             "*Tax and MOT*\n"
             f"{self.str_tax}\n{self.str_mot}\n{self.str_vfivec}\n\n"
             "*Emissions & classification*\n"
-            f"{self.str_emissions} {self.str_euro}."
+            f"{self.str_euro_and_emissions}."
         )
 
     @property
@@ -448,7 +448,7 @@ class DVLAVehicle:
         if not self.dvla_reg:
             return ""
         return (
-            f" (and was first registered to the DVLA during the month of {self.dvla_reg_month}"
+            f" (and was first registered to the DVLA during the month of {months[self.dvla_reg_month]}"
             f", {self.dvla_reg_year})"
         )
 
@@ -468,7 +468,20 @@ class DVLAVehicle:
         return f"Vehicle has type approval {self.type_app}, which defines it as {self.type_app_d.value.lower()}."
 
     @property
+    def str_euro_and_emissions(self) -> str:
+        if not self.emissions and not self.capacity and not self.emissions_real and not self.euro:
+            return (
+                "The DVLA has no records or recorded European Emissions Standard band rating"
+                "for this vehicle."
+            )
+        if self.capacity and not self.emissions and not self.emissions_real:
+            return f"{self.str_emissions_capacity}. {self.str_euro}"
+        return f"{self.str_emissions} {self.str_euro}"
+
+    @property
     def str_emissions(self) -> str:
+        if not self.emissions and not self.capacity and not self.emissions_real:
+            return "The DVLA has no records about the vehicle's engine capacity or emissions."
         return f"{self.str_emissions_capacity}, {self.str_emissions_co}. {self.str_emissions_real}"
 
     @property
