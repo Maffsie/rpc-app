@@ -79,9 +79,9 @@ def inline_req():
         raise DishonourableError("fuck you :)")
     render_chad(impose=req.content, inline_id=req.inline_id, suffix=0)
     render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1)
-    prefix = f"{request.host_url}{routes.url_prefix}"
+    prefix = f"{request.host_url}v2/{routes.url_prefix}"
     if request.headers.get("x-forward-proto", "").lower() == "https":
-        prefix = f"https://{request.host}/{routes.url_prefix}"
+        prefix = f"https://{request.host}/v2/{routes.url_prefix}"
     req.append_response([
         f"{prefix}/renders/{req.inline_id}.0",
         f"{prefix}/renders/{req.inline_id}.0.t",
