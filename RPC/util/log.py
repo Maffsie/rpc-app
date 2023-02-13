@@ -42,7 +42,7 @@ class Logger(Configurable):
         "loki_url": "FLUUNSET",
     }
     errdes = {
-        "FLUUNSET": "Loki URL not set!",
+        "FLUUNSET": "LOKI_URL not set! Hint: it should be <loki-host>/loki/api/v1/push",
     }
 
     def __init__(

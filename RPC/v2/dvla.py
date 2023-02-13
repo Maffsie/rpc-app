@@ -15,3 +15,11 @@ def reg_lookup(reg: str):
         result.str_basic,
         200,
     )
+
+@routes.route("/lookup_inline/<string:reg>")
+def reg_lookup(reg: str):
+    result = current_app.providers["dvla"].lookup(reg)
+    return (
+        result.str_basic,
+        200
+    )
