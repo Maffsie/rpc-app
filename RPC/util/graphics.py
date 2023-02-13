@@ -253,7 +253,7 @@ def inline_render_rdj(impose: str, inline_id: str, suffix: int):
     return ([
         f"{prefix}/{inline_id}.{suffix}",
         f"{prefix}/{inline_id}.{suffix}.t",
-    ], (677, 600,), "rdj", 0)
+    ], (677, 600,), "rdj", suffix)
 
 
 def inline_render_chad(impose: str, inline_id: str, suffix: int):
@@ -262,7 +262,7 @@ def inline_render_chad(impose: str, inline_id: str, suffix: int):
     return ([
         f"{prefix}/{inline_id}.{suffix}",
         f"{prefix}/{inline_id}.{suffix}.t",
-    ], (585, 525,), "chad", 0)
+    ], (585, 525,), "chad", suffix)
 
 
 def render_rdj(*args, **kwargs):
