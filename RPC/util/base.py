@@ -64,10 +64,6 @@ class Api(Blueprint):
     def include(self, *args):
         [self.register_blueprint(api) for api in args]
 
-    @property
-    def fqprefix(self):
-        return f"{request.host_url}/{self.url_prefix}"
-
 
 class IApi(Session):
     """

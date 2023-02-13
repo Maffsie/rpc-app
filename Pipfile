@@ -8,6 +8,7 @@ name = "pypi"
 flask = "*"
 gunicorn = "*"
 python-dotenv = "*"
+python-logging-loki = "*"
 # cron.tailzone
 python-digitalocean = "*"
 # util.graphics
@@ -18,7 +19,6 @@ python-dateutil = "*"
 requests = "*"
 # vnd.tailscale
 tailscale = "*"
-python-logging-loki = "*"
 
 [dev-packages]
 black = "*"
