@@ -393,7 +393,7 @@ class DVLAVehicle:
             )
 
         self.taxed = coerce_type(ves_response.get("taxStatus", None), bool)
-        if self.taxed is not None:
+        if self.taxed is not None and ves_response.get("taxDueDate", None) is not None:
             self.tax_due_year = coerce_type(
                 ves_response["taxDueDate"].split("-")[0], int
             )
@@ -406,7 +406,7 @@ class DVLAVehicle:
         self.art_end_date = ves_response.get("artEndDate", None)
 
         self.moted = coerce_type(ves_response.get("motStatus", None), bool)
-        if self.moted is not None:
+        if self.moted is not None and ves_response.get("motExpiryDate", None) is not None:
             self.mot_until_year = coerce_type(
                 ves_response["motExpiryDate"].split("-")[0], int
             )
