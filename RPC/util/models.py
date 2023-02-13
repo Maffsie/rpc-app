@@ -273,11 +273,11 @@ class FuelType(Enum):
     Fuel types
     """
 
-    Diesel = auto()
-    Electricity = auto()
-    Hybrid = "Hybrid Electric"
-    Petrol = auto()
-    Steam = auto()
+    Diesel = "a Diesel"
+    Electricity = "an Electric"
+    Hybrid = "a Hybrid Electric"
+    Petrol = "a Petrol"
+    Steam = "a Steam"
 
 
 class IVATypeApproval(Enum):
@@ -423,7 +423,7 @@ class DVLAVehicle:
             "*Basic information*\n"
             f"Vehicle with registration number *{self.number}* is a *{self.colour} {self.year} "
             f"{self.manufacturer}*, whose wheel layout is *{self.layout}*.\n"
-            f"It has a {self.fuel.name} engine, and was registered during the month of "
+            f"It has {self.str_fuel} engine, and was registered during the month of "
             f"{months[self.reg_month]}, {self.reg_year}{self.str_dvlareg}. "
             f"It is {'' if self.exportable else 'not '}marked for export. {self.str_type}\n\n"
             "*Tax and MOT*\n"
@@ -442,6 +442,12 @@ class DVLAVehicle:
             f"{self.reg_year}{self.str_dvlareg}. "
             f"It is {'' if self.exportable else 'not '}marked for export. {self.str_euro}"
         )
+
+    @property
+    def str_fuel(self) -> str:
+        if isinstance(self.fuel, FuelType):
+            return self.fuel.value
+        return self.fuel
 
     @property
     def str_dvlareg(self) -> str:
