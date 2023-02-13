@@ -8,8 +8,8 @@ from RPC.util.errors import InternalOperationalError, InvalidInputError
 from RPC.util.helpers import Configurable
 from RPC.util.models import DVLAVehicle
 
-# UK license plates do not have the letter I
-v_regnum = compile("^[a-hj-zA-HJ-Z0-9]+$")
+# apparently i am a fool
+v_regnum = compile("^[a-zA-Z0-9]+$")
 
 
 class Doovla(Configurable, WithLogging, IApi):
