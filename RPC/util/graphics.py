@@ -186,7 +186,7 @@ def impose_text(
     return buf
 
 
-def inner_render_chad(impose: str, inline_id: int):
+def inner_render_chad(impose: str, inline_id: int, suffix: int):
     canvas_sz = (585, 525)
     thumb_sz = (150, 150)
     text_font = "resources/fonts/CALIBRI.TTF"
@@ -207,12 +207,12 @@ def inner_render_chad(impose: str, inline_id: int):
         "resources/img/bases/chad.png"
     ) as base:
         base.paste(ImageChops.multiply(blit, base), (0, 0))
-        base.save(f"/tmp/r_{inline_id}.jpg", "JPEG", quality=35)
+        base.save(f"/tmp/r_{inline_id}.{suffix}.jpg", "JPEG", quality=35)
         base.thumbnail(thumb_sz, Image.Resampling.BILINEAR)
-        base.save(f"/tmp/r_{inline_id}_t.jpg", "JPEG", quality=75)
+        base.save(f"/tmp/r_{inline_id}.{suffix}_t.jpg", "JPEG", quality=75)
 
 
-def inner_render_rdj(impose: str, inline_id: int):
+def inner_render_rdj(impose: str, inline_id: int, suffix: int):
     canvas_start_sz = (422, 677)
     canvas_stretchfuck_factor = 1.5
     canvas_scalefuck_sz = (
@@ -242,9 +242,9 @@ def inner_render_rdj(impose: str, inline_id: int):
         "resources/img/bases/rdj.jpg"
     ) as base:
         base.paste(ImageChops.multiply(blit, base), (0, 0))
-        base.save(f"/tmp/r_{inline_id}.jpg", "JPEG", quality=35)
+        base.save(f"/tmp/r_{inline_id}.{suffix}.jpg", "JPEG", quality=35)
         base.thumbnail(canvas_thumb_sz, Image.Resampling.BILINEAR)
-        base.save(f"/tmp/r_{inline_id}_t.jpg", "JPEG", quality=75)
+        base.save(f"/tmp/r_{inline_id}.{suffix}_t.jpg", "JPEG", quality=75)
 
 
 def render_rdj(*args, **kwargs):

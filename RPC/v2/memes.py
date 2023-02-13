@@ -77,6 +77,16 @@ def inline_req():
         raise InternalOperationalError(f"something went wrong: {e}")
     if not req.honour_request:
         raise DishonourableError("fuck you :)")
+    render_chad(impose=req.content, inline_id=req.inline_id, suffix=0)
+    render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1)
+    req.append_response([
+        f"{routes.fqprefix}/renders/{req.inline_id}.0",
+        f"{routes.fqprefix}/renders/{req.inline_id}.0.t",
+    ], (585, 525,), "chad", 0)
+    req.append_response([
+        f"{routes.fqprefix}/renders/{req.inline_id}.1",
+        f"{routes.fqprefix}/renders/{req.inline_id}.1.t",
+    ], (578, 677,), "rdj", 1)
     return req.jdict
 
 
@@ -85,10 +95,10 @@ def inline_req():
 def req_rdj():
     impose = request.args.get("s", "type something already")
     inline_id = coerce_type(request.args.get("i", None), int, need=True)
-    render_rdj(impose=impose, inline_id=inline_id)
+    render_rdj(impose=impose, inline_id=inline_id, suffix=0)
     return [
-        f"{routes.url_prefix}/renders/{inline_id}",
-        f"{routes.url_prefix}/renders/{inline_id}.t",
+        f"{routes.url_prefix}/renders/{inline_id}.0",
+        f"{routes.url_prefix}/renders/{inline_id}.0.t",
     ]
 
 
@@ -97,25 +107,25 @@ def req_rdj():
 def req_chad():
     impose = request.args.get("s", None)
     inline_id = coerce_type(request.args.get("i", None), int, need=True)
-    render_chad(impose=impose, inline_id=inline_id)
+    render_chad(impose=impose, inline_id=inline_id, suffix=0)
     return [
-        f"{routes.url_prefix}/renders/{inline_id}",
-        f"{routes.url_prefix}/renders/{inline_id}.t",
+        f"{routes.url_prefix}/renders/{inline_id}.0",
+        f"{routes.url_prefix}/renders/{inline_id}.0.t",
     ]
 
 
-@routes.route("/renders/<int:inline_id>.t")
+@routes.route("/renders/<float:inline_id>.t")
 @throws(InvalidInputError, MissingFileError)
-def fetch_thumb(inline_id: int):
+def fetch_thumb(inline_id: float):
     fpath = Path(f"/tmp/r_{inline_id}_t.jpg")
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered thumbnail could not be found.")
     return send_file(fpath)
 
 
-@routes.route("/renders/<int:inline_id>")
+@routes.route("/renders/<float:inline_id>")
 @throws(InvalidInputError, MissingFileError)
-def fetch_render(inline_id: int):
+def fetch_render(inline_id: float):
     fpath = Path(f"/tmp/r_{inline_id}.jpg")
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered image could not be found.")

@@ -527,7 +527,7 @@ class TelegramInvocableResult:
 
 
 class TelegramInlineRequest:
-    inline_id: int = None
+    inline_id: str = None
     chat_id: int | None = None
     content: str = None
     request_type: str = None
@@ -539,8 +539,8 @@ class TelegramInlineRequest:
     responses: list = None
 
     def __init__(self, request: Request):
-        reqj = request.json()
-        self.inline_id = coerce_type(reqj["inlineQueryId"], int, need=True)
+        reqj = request.json
+        self.inline_id = reqj["inlineQueryId"]
         self.chat_id = coerce_type(reqj.get("chatId", None), int)
         self.content = reqj["content"]
         self.request_type = reqj["type"]
