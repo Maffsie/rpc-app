@@ -6,7 +6,7 @@ from RPC.util.base import IApi
 from RPC.util.decorators import throws, validator
 from RPC.util.errors import InternalOperationalError, InvalidInputError
 from RPC.util.helpers import Configurable
-from RPC.util.models import DVLAVehicle
+from RPC.util.models import DVLAError, DVLAVehicle
 
 # apparently i am a fool
 v_regnum = compile("^[a-zA-Z0-9]+$")
@@ -47,8 +47,6 @@ class Doovla(Configurable, WithLogging, IApi):
                         "the vehicle may have been scrapped."
                     )
                 case _:
-                    raise InternalOperationalError(
-                        f"Status {resp.status_code} from DVLA: {resp.content}", resp
-                    )
+                    raise InternalOperationalError(DVLAError(resp))
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)

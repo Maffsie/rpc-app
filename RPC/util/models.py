@@ -1,6 +1,7 @@
 from enum import Enum, auto
 
 from flask import Request
+from requests import Response
 
 from RPC.util.coercion import coerce_type
 
@@ -303,6 +304,27 @@ class IVATypeApproval(Enum):
     O2 = "a light trailer with maximum weight between 0.75t and 3.5t"
     O3 = "a medium trailer with maximum weight between 3.5t and 10t"
     O4 = "a heavy trailer with maximum weight above 10t"
+
+
+class DVLAError:
+    major: int = None
+    minor: int = None
+    reason: str = None
+    detail: str = None
+    _j: dict = None
+
+    def __init__(self, resp: Response):
+        self._j = resp.json()
+        self.major = self._j["errors"][0]["status"]
+        self.minor = self._j["errors"][0]["code"]
+        self.reason = self._j["errors"][0]["title"]
+        self.detail = self._j["errors"][0]["detail"]
+
+    def __str__(self):
+        return f"{self.major}.{self.minor} {self.reason}: {self.detail}"
+
+    def __repr__(self):
+        return f"<DVLAError {self.major}.{self.minor} [{self.reason} [{self.detail}]]>"
 
 
 class DVLAVehicle:
