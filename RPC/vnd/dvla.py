@@ -48,7 +48,7 @@ class Doovla(Configurable, WithLogging, IApi):
                     )
                 case _:
                     raise InternalOperationalError(
-                        f"Status {resp.status_code} from DVLA", resp
+                        f"Status {resp.status_code} from DVLA: {resp.content}", resp
                     )
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)
