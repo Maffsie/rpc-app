@@ -115,19 +115,19 @@ def req_chad():
     ]
 
 
-@routes.route("/renders/<float:inline_id>.t")
+@routes.route("/renders/<int:inline_id>.<int:suffix>.t")
 @throws(InvalidInputError, MissingFileError)
-def fetch_thumb(inline_id: float):
-    fpath = Path(f"/tmp/r_{inline_id}_t.jpg")
+def fetch_thumb(inline_id: int, suffix: int):
+    fpath = Path(f"/tmp/r_{inline_id}.{suffix}_t.jpg")
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered thumbnail could not be found.")
     return send_file(fpath)
 
 
-@routes.route("/renders/<float:inline_id>")
+@routes.route("/renders/<int:inline_id>.<int:suffix>")
 @throws(InvalidInputError, MissingFileError)
-def fetch_render(inline_id: float):
-    fpath = Path(f"/tmp/r_{inline_id}.jpg")
+def fetch_render(inline_id: int, suffix: int):
+    fpath = Path(f"/tmp/r_{inline_id}.{suffix}.jpg")
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered image could not be found.")
     return send_file(fpath)
