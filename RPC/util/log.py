@@ -69,6 +69,9 @@ class Logger(Configurable):
         )
         # logging.captureWarnings(True)
 
+    def get_logger(self, name: str) -> logging.Logger:
+        return self._logger.getChild(name)
+
     def write(self, level: LogLevel, msg: str, *args, **kwargs):
         """
         Simple logger function. Prints a correlation ID, the log level and the message.

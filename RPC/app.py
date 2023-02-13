@@ -13,6 +13,8 @@ class RPCApp(Base, Flask):
 
     def __init__(self, appid: str):
         super().__init__(None, appid)
+        # Override the Flask logger
+        self.logger = self.log.get_logger(__name__)
         self.setup_providers()
         self.setup_services()
 
