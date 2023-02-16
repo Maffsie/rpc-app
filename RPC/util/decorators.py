@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import Response, current_app, request
+from quart import Response, current_app, request
 
 from RPC.util.errors import AuthRequiredError, InvalidInputError, RPCException
 from RPC.util.models import RPCGrantType

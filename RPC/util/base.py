@@ -1,7 +1,7 @@
 import inspect
 from uuid import UUID
 
-from flask import Blueprint
+from quart import Blueprint
 from requests import Session
 
 from RPC.util.helpers import Configurable

@@ -1,4 +1,4 @@
-from flask import jsonify
+from quart import jsonify
 
 from RPC.util.base import Api
 

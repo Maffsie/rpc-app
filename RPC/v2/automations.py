@@ -1,4 +1,4 @@
-from flask import current_app
+from quart import current_app
 
 from RPC.util.base import Api
 

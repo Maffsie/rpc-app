@@ -1,4 +1,4 @@
-from flask import current_app as rpc
+from quart import current_app as rpc
 
 from RPC.util.base import Api
 from RPC.util.decorators import require_token

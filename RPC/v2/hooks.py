@@ -1,4 +1,4 @@
-from flask import current_app, request
+from quart import current_app, request
 
 from RPC.util.base import Api
 from RPC.util.decorators import throws

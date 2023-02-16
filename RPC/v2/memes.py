@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from flask import current_app, request, send_file
+from quart import current_app, request, send_file
 
 from RPC.util.base import Api
 from RPC.util.coercion import coerce_type

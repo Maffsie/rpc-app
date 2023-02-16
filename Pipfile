@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 # core dependencies
-flask = "*"
 gunicorn = "*"
 python-dotenv = "*"
 python-logging-loki = "*"
+quart = "*"
 # cron.tailzone
 python-digitalocean = "*"
 # util.graphics

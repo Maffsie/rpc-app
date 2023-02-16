@@ -1,4 +1,4 @@
-from flask import request
+from quart import request
 
 from RPC.util.errors import (
     AuthExpiredError,

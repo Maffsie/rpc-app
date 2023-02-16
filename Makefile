@@ -42,9 +42,9 @@ EXPOSE_PORT ?= 8069
 #code style, syntax and function validation
 .PHONY: format lint test ci-test
 #code-running
-.PHONY: flask-run gunicorn-run
+.PHONY: quart-run gunicorn-run
 #code-debugging
-.PHONY: flask-debug
+.PHONY: quart-debug
 #operational checks
 .PHONY: healthcheck
 #container-only
@@ -135,15 +135,15 @@ resources:
 $(RESTGTS): resources
 	cp -pr $(RESDPATH)/$(shell $(ENVBIN) basename $@) $@
 
-# Starts the Flask development server
+# Starts the Quart development server
 #  Depends on requirements because you'd normally run this during dev, where requirements
 #   are being changed
-flask-run: requirements $(RESTGTS) banner
-	pipenv run flask -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
+quart-run: requirements $(RESTGTS) banner
+	pipenv run quart -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
 
-# Starts the Flask development server in debug mode
-flask-debug: requirements $(RESTGTS) banner
-	pipenv run flask --debug -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
+# Starts the Quart development server in debug mode
+quart-debug: requirements $(RESTGTS) banner
+	pipenv run quart --debug -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
 
 # Starts the gunicorn production server
 #  Does not depend on requirements, because this would be run in a packaged scenario

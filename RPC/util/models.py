@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-from flask import Request
+from quart import Request
 from requests import Response
 
 from RPC.util.coercion import coerce_type
