@@ -314,6 +314,22 @@ class DVLAError:
     _j: dict = None
 
     def __init__(self, resp: Response):
+        self.major = resp.status_code
+        match resp.status_code:
+            case 403:
+                self.reason = (
+                    "Unable to look up registration number due to an API error. The DVLA responded "
+                    "Forbidden, which is not a temporary problem. Please contact @Maffsie."
+                )
+                return
+            case 404:
+                self.reason = (
+                    "Registration number is in a valid format, but was not recognised by the DVLA. "
+                    "If you know this to be a previously valid and registered registration number, "
+                    "the vehicle may have been scrapped, or the number may have been removed from "
+                    "a specific vehicle."
+                )
+                return
         self._j = resp.json()
         self.major = self._j["errors"][0]["status"]
         self.minor = self._j["errors"][0]["code"]
@@ -321,9 +337,13 @@ class DVLAError:
         self.detail = self._j["errors"][0]["detail"]
 
     def __str__(self):
+        if not self.minor:
+            return f"{self.reason} ({self.major})"
         return f"{self.major}.{self.minor} {self.reason}: {self.detail}"
 
     def __repr__(self):
+        if not self.minor:
+            return f"<DVLAError {self.major}>"
         return f"<DVLAError {self.major}.{self.minor} [{self.reason} [{self.detail}]]>"
 
 

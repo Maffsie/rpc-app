@@ -37,16 +37,8 @@ class Doovla(Configurable, WithLogging, IApi):
                     "registrationNumber": reg,
                 },
             )
-            match resp.status_code:
-                case 200:
-                    return DVLAVehicle(resp.json())
-                case 404:
-                    return (
-                        "Registration number not recognised. If you know the registration "
-                        "number to be accurate and previously valid and registered, "
-                        "the vehicle may have been scrapped."
-                    )
-                case _:
-                    raise InternalOperationalError(DVLAError(resp))
+            if resp.status_code == 200:
+                return DVLAVehicle(resp.json())
+            return DVLAError(resp)
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)
