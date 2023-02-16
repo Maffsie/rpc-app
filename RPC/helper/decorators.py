@@ -2,8 +2,8 @@ from functools import wraps
 
 from flask import Response, current_app, request
 
+from RPC.models.auth import RPCGrantType
 from RPC.util.errors import AuthRequiredError, InvalidInputError, RPCException
-from RPC.util.models import RPCGrantType
 
 
 def throws(*etypes):

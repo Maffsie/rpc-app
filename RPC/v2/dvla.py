@@ -1,13 +1,13 @@
 from flask import current_app as rpc
 
-from RPC.util.base import Api
-from RPC.util.decorators import require_token
-from RPC.util.models import RPCGrantType, DVLAVehicle
+from RPC.helper.decorators import require_token
+from RPC.models import DVLAVehicle, RPCGrantType
+from RPC.roots import Api
 
 routes = Api()
 
 
-@routes.route("/lookup/<string:reg>")
+@routes.get("/lookup/<string:reg>")
 @require_token(RPCGrantType.DVLALookup)
 def reg_lookup(reg: str):
     result = rpc.providers["dvla"].lookup(reg)
@@ -17,7 +17,7 @@ def reg_lookup(reg: str):
     )
 
 
-@routes.route("/lookup_inline/<string:reg>")
+@routes.get("/lookup_inline/<string:reg>")
 def reg_lookup_inline(reg: str):
     result = rpc.providers["dvla"].lookup(reg)
     if isinstance(result, DVLAVehicle):

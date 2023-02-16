@@ -1,6 +1,5 @@
-from RPC.layers import WithLogging
-from RPC.util.base import IApi
-from RPC.util.helpers import Configurable
+from RPC.helper import Configurable, WithLogging
+from RPC.roots import IApi
 
 
 class Switchbot(Configurable, WithLogging, IApi):

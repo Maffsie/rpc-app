@@ -1,7 +1,6 @@
-from RPC.util.base import Api
-from RPC.v1.health import routes as health
+from RPC.roots import Api
+
+from .health import routes as health
 
 api = Api()
-api.include(
-    health,
-)
+#api.include(health)

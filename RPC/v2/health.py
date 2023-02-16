@@ -1,11 +1,11 @@
 from flask import jsonify
 
-from RPC.util.base import Api
+from RPC.roots import Api
 
 routes = Api()
 
 
-@routes.route("/alive")
+@routes.get("/alive")
 def heartbeat_check():
     return (
         jsonify(

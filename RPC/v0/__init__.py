@@ -1,8 +1,8 @@
-from RPC.util.base import Api
-from RPC.v0.funcs import routes as funcs
-from RPC.v0.gen import routes as gen
-from RPC.v0.misc import routes as misc
-from RPC.v0.public import routes as public
+from RPC.roots import Api
+
+from .funcs import routes as funcs
+from .gen import routes as gen
+from .misc import routes as misc
 
 api = Api(url_prefix="/")
-api.include(funcs, gen, misc, public)
+#api.include(funcs, gen, misc)

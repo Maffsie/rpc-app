@@ -4,8 +4,7 @@ from urllib import parse
 from dateutil import parser
 from requests import get
 
-from RPC.util.helpers import Configurable
-from RPC.util.layers import WithInfluxDB, WithLogging
+from RPC.helper import Configurable, WithInfluxDB, WithLogging
 
 
 class Octopussy(WithInfluxDB, WithLogging, Configurable):

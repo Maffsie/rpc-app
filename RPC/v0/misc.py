@@ -1,10 +1,10 @@
-from RPC.util.base import Api
+from RPC.roots import Api
 
 routes = Api(url_prefix="/")
 
 
-@routes.route("/ping")
-@routes.route("/ping/js")
-@routes.route("/ping/py/2")
+@routes.get("/ping")
+@routes.get("/ping/js")
+@routes.get("/ping/py/2")
 def ping():
     return "pong"

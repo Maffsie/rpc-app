@@ -1,6 +1,6 @@
 import builtins
 from enum import Enum
-from typing import Any, TypeVar
+from typing import Any, Generic, TypeVar
 
 from RPC.util.errors import InvalidInputError
 
@@ -39,24 +39,25 @@ TRUEABLE_WORDS = [
 ]
 
 
-def coerce_type(have: Any, want: T, need: bool = False) -> T | None:
+def coerce_type(have: Any, want: T, need: bool = False) -> T:
     """Function to coerce a given input to be of type T, optionally raising an exception if impossible.
 
     If the given input is already of type T, it is returned as-is.
     Otherwise, this function follows the given chain of logic:
+
     * If T is an Enum or a member thereof, attempt to coerce input into a member of T.
-    ** If input is a value known to the enum, the primary member with that value is returned
-    ** If input is the name of a member of the enum, that member is returned
-    ** If input, case insensitive, is the name or value of any member in the enum, that member is returned
-    ** If none of the above, return None (or exception)
+    * If input is a value known to the enum, the primary member with that value is returned
+    * If input is the name of a member of the enum, that member is returned
+    * If input, case insensitive, is the name or value of any member in the enum, that member is returned
+    * If none of the above, return None (or exception)
     * If T is a bool, attempt to coerce input to a boolean value
-    ** If input, interpreted as a string, case-insensitively matches "1" or any words which can reasonably mean "true" in this context, return True
-    ** if none of the above, return False
+    * If input, interpreted as a string, case-insensitively matches "1" or any words which can reasonably mean "true" in this context, return True
+    * if none of the above, return False
 
     Args:
         have (Any): Arbitrary data to be coerced.
-        want (T): _description_
-        need (bool, optional): _description_. Defaults to False.
+        want T: The desired type for `have`, or if `need` is False, a default value.
+        need (bool, optional): Whether to raise an exception on coercion failure. Defaults to False.
 
     Returns:
         T | None: Returns either the input (have) coerced to type T (want)
@@ -69,7 +70,7 @@ def coerce_type(have: Any, want: T, need: bool = False) -> T | None:
             return have
         if not isinstance(want, type):
             want = type(want)
-        if type(have) is want or want is type(None):
+        if type(have) is want or isinstance(want, type(None)):
             return have
         if isinstance(want, type(Enum)):
             # Enum(Item) returns the enum member corresponding to the value

@@ -1,13 +1,14 @@
-from RPC.util.base import Api
+from RPC.roots import Api
 
 routes = Api()
 
 
-@routes.route("/voip/sms", methods=["GET"])
+@routes.get("/voip/sms")
 def last_sms():
     return "no"
 
 
-@routes.route("/voip/sms", methods=["POST", "PUT"])
+@routes.post("/voip/sms")
+@routes.put("/voip/sms")
 def new_sms():
     return "no"

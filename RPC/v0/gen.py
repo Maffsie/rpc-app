@@ -1,11 +1,11 @@
 import uuid
 
-from RPC.util.base import Api
+from RPC.roots import Api
 
 routes = Api()
 
 
-@routes.route("/uuid")
+@routes.get("/uuid")
 def unversioned_uuid():
     return {
         "status": 200,
@@ -13,8 +13,8 @@ def unversioned_uuid():
     }
 
 
-@routes.route("/uuid/<int:version>")
-@routes.route("/uuid/v<int:version>")
+@routes.get("/uuid/<int:version>")
+@routes.get("/uuid/v<int:version>")
 def versioned_uuid(version: int):
     resp = {
         "uuid": "",
@@ -37,8 +37,8 @@ def versioned_uuid(version: int):
     return {"status": 200, **resp}
 
 
-@routes.route("/uuid/<int:version>/<string:uuidtype>/<string:uuidns>")
-@routes.route("/uuid/v<int:version>/<string:uuidtype>/<string:uuidns>")
+@routes.get("/uuid/<int:version>/<string:uuidtype>/<string:uuidns>")
+@routes.get("/uuid/v<int:version>/<string:uuidtype>/<string:uuidns>")
 def namespaced_uuid(version: int, uuidtype: str, uuidns: str):
     resp = {
         "uuid": "",

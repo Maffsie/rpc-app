@@ -1,8 +1,10 @@
-from RPC.util.base import Api
-from RPC.v2.dvla import routes as dvla_ves
-from RPC.v2.health import routes as health
-from RPC.v2.hooks import routes as hooks
-from RPC.v2.memes import routes as memes
+from RPC.roots import Api
+
+from .automations import routes as automations
+from .dvla import routes as dvla_ves
+from .health import routes as health
+from .hooks import routes as hooks
+from .memes import routes as memes
 
 api = Api()
-api.include(dvla_ves, health, hooks, memes)
+#api.include(automations, dvla_ves, health, hooks, memes)

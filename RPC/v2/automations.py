@@ -1,21 +1,21 @@
 from flask import current_app
 
-from RPC.util.base import Api
+from RPC.roots import Api
 
 routes = Api()
 
 
-@routes.route("/devices")
+@routes.get("/devices")
 def devicelist():
     return (
-        current_app.providers["switchbot"].devices(),
+        current_app.providers["switchbot"].devices,
         200,
     )
 
 
-@routes.route("/scenes")
+@routes.get("/scenes")
 def scenelist():
     return (
-        current_app.providers["switchbot"].scenes(),
+        current_app.providers["switchbot"].scenes,
         200,
     )

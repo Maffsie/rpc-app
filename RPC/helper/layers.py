@@ -3,7 +3,7 @@ import sqlite3
 
 from influxdb import InfluxDBClient
 
-from RPC.util.helpers import load_conf_static
+from RPC.helper import load_conf_static
 
 
 class WithDBConf:

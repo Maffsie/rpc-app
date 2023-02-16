@@ -1,19 +1,17 @@
 from pathlib import Path
 
-from flask import current_app, request, send_file
+from flask import request, send_file
 
-from RPC.util.base import Api
-from RPC.util.coercion import coerce_type
-from RPC.util.decorators import throws
+from RPC.helper import throws
+from RPC.models.telegram import TelegramInlineRequest
+from RPC.roots import Api
 from RPC.util.errors import (
     DishonourableError,
-    ImageGenerationError,
     InternalOperationalError,
     InvalidInputError,
     MissingFileError,
 )
 from RPC.util.graphics import inline_render_chad, inline_render_rdj
-from RPC.util.models import TelegramInlineRequest
 
 routes = Api()
 
@@ -70,7 +68,7 @@ def inline_req():
     ]
     - cache_time: int = 86400
     """
-    req: TelegramInlineRequest = None
+    req: TelegramInlineRequest
     try:
         req = TelegramInlineRequest(request)
     except Exception as e:
@@ -82,7 +80,7 @@ def inline_req():
     return req.jdict
 
 
-@routes.route("/renders/<int:inline_id>.<int:suffix>.t")
+@routes.get("/renders/<int:inline_id>.<int:suffix>.t")
 @throws(InvalidInputError, MissingFileError)
 def fetch_thumb(inline_id: int, suffix: int):
     fpath = Path(f"/tmp/r_{inline_id}.{suffix}_t.jpg")
@@ -91,7 +89,7 @@ def fetch_thumb(inline_id: int, suffix: int):
     return send_file(fpath)
 
 
-@routes.route("/renders/<int:inline_id>.<int:suffix>")
+@routes.get("/renders/<int:inline_id>.<int:suffix>")
 @throws(InvalidInputError, MissingFileError)
 def fetch_render(inline_id: int, suffix: int):
     fpath = Path(f"/tmp/r_{inline_id}.{suffix}.jpg")

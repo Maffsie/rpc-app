@@ -1,6 +1,9 @@
+from importlib import import_module
+from pkgutil import iter_modules
+
 from flask import Flask
 
-from RPC.util.base import Base
+from .roots import Base
 
 
 class RPCApp(Base, Flask):
@@ -17,14 +20,19 @@ class RPCApp(Base, Flask):
         self.logger = self.log.get_logger(__name__)
         self.setup_providers()
         self.setup_services()
+        self.find_routes()
 
-    def include(self, *args):
-        [self.register_blueprint(api) for api in args]
+    def find_routes(self):
+        _routes = [getattr(import_module(name), "api")
+                   for _, name, _
+                   in iter_modules([self.root_path], "RPC.")
+                   if name.startswith("RPC.v")]
+        [self.register_blueprint(api) for api in _routes]
 
     def setup_providers(self):
         # TODO: this should really be dynamic..
-        from RPC.vnd.dvla import Doovla
-        from RPC.vnd.switchbot import Switchbot
+        from RPC.provider.dvla import Doovla
+        from RPC.provider.switchbot import Switchbot
 
         self.providers["dvla"] = Doovla()
         self.providers["switchbot"] = Switchbot()

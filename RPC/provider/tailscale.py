@@ -3,7 +3,7 @@ from asyncio import run as wait
 from digitalocean import Domain as DOdomain
 from tailscale import Tailscale
 
-from RPC.util.helpers import Configurable
+from RPC.helper import Configurable
 
 
 class Tailzone(Configurable):

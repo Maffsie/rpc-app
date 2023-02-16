@@ -1,10 +1,12 @@
 import inspect
+from importlib import import_module
+from pkgutil import iter_modules
 from uuid import UUID
 
 from flask import Blueprint
 from requests import Session
 
-from RPC.util.helpers import Configurable
+from RPC.helper import Configurable
 from RPC.util.log import Logger
 
 
@@ -60,6 +62,20 @@ class Api(Blueprint):
         super().__init__(
             *args, name=caller, import_name=callermod, url_prefix=url_prefix, **kwargs
         )
+        if calling_frame.code_context[0].startswith("api"):
+            self.find_routes()
+
+    def find_routes(self):
+        _routes = [import_module(name)
+                   for _, name, _
+                   in iter_modules([self.root_path], self.import_name+".")
+                   if name != self.import_name
+                   and name.startswith(self.import_name.rpartition(".")[0]+".")
+                   and "._" not in name]
+        [self.register_blueprint(getattr(route, "routes"))
+         for route in _routes
+         if hasattr(route, "routes")]
+
 
     def include(self, *args):
         [self.register_blueprint(api) for api in args]
