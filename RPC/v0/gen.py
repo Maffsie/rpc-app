@@ -6,7 +6,7 @@ routes = Api()
 
 
 @routes.route("/uuid")
-def unversioned_uuid():
+async def unversioned_uuid():
     return {
         "status": 200,
         "uuid": uuid.uuid4(),
@@ -15,7 +15,7 @@ def unversioned_uuid():
 
 @routes.route("/uuid/<int:version>")
 @routes.route("/uuid/v<int:version>")
-def versioned_uuid(version: int):
+async def versioned_uuid(version: int):
     resp = {
         "uuid": "",
     }
@@ -39,7 +39,7 @@ def versioned_uuid(version: int):
 
 @routes.route("/uuid/<int:version>/<string:uuidtype>/<string:uuidns>")
 @routes.route("/uuid/v<int:version>/<string:uuidtype>/<string:uuidns>")
-def namespaced_uuid(version: int, uuidtype: str, uuidns: str):
+async def namespaced_uuid(version: int, uuidtype: str, uuidns: str):
     resp = {
         "uuid": "",
     }

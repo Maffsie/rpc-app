@@ -6,7 +6,7 @@ routes = Api()
 
 
 @routes.route("/alive")
-def heartbeat_check():
+async def heartbeat_check():
     return (
         jsonify(
             {

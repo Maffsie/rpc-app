@@ -20,7 +20,7 @@ routes = Api()
 
 @routes.post("/inline")
 @throws(InvalidInputError)
-def inline_req():
+async def inline_req():
     """
     payload:
     - chatId: int | None
@@ -72,19 +72,19 @@ def inline_req():
     """
     req: TelegramInlineRequest = None
     try:
-        req = TelegramInlineRequest(request)
+        req = TelegramInlineRequest(await request)
     except Exception as e:
         raise InternalOperationalError(f"something went wrong: {e}")
     if not req.honour_request:
         raise DishonourableError("fuck you :)")
-    req.append_response(*inline_render_chad(impose=req.content, inline_id=req.inline_id, suffix=0))
-    req.append_response(*inline_render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1))
+    req.append_response(*await inline_render_chad(impose=req.content, inline_id=req.inline_id, suffix=0))
+    req.append_response(*await inline_render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1))
     return req.jdict
 
 
 @routes.route("/renders/<int:inline_id>.<int:suffix>.t")
 @throws(InvalidInputError, MissingFileError)
-def fetch_thumb(inline_id: int, suffix: int):
+async def fetch_thumb(inline_id: int, suffix: int):
     fpath = Path(f"/tmp/r_{inline_id}.{suffix}_t.jpg")
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered thumbnail could not be found.")
@@ -93,7 +93,7 @@ def fetch_thumb(inline_id: int, suffix: int):
 
 @routes.route("/renders/<int:inline_id>.<int:suffix>")
 @throws(InvalidInputError, MissingFileError)
-def fetch_render(inline_id: int, suffix: int):
+async def fetch_render(inline_id: int, suffix: int):
     fpath = Path(f"/tmp/r_{inline_id}.{suffix}.jpg")
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered image could not be found.")

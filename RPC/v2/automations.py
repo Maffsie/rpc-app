@@ -6,16 +6,16 @@ routes = Api()
 
 
 @routes.route("/devices")
-def devicelist():
+async def devicelist():
     return (
-        current_app.providers["switchbot"].devices(),
+        await current_app.providers["switchbot"].devices(),
         200,
     )
 
 
 @routes.route("/scenes")
-def scenelist():
+async def scenelist():
     return (
-        current_app.providers["switchbot"].scenes(),
+        await current_app.providers["switchbot"].scenes(),
         200,
     )

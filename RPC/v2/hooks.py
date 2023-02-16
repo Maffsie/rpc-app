@@ -16,8 +16,8 @@ routes = Api(url_prefix="/")
 @throws(
     InvalidInputError,
 )
-def fritzbox_s2h():
-    current_app.log.notice('{"api":"v2.hooks.fritzbox_in","body":%s}' % request.data)
+async def fritzbox_s2h():
+    current_app.log.notice('{"api":"v2.hooks.fritzbox_in","body":%s}' % await request.data)
     return (
         "i have eaten it",
         200,

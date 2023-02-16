@@ -6,5 +6,5 @@ routes = Api(url_prefix="/")
 @routes.route("/ping")
 @routes.route("/ping/js")
 @routes.route("/ping/py/2")
-def ping():
+async def ping():
     return "pong"

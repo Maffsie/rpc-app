@@ -9,8 +9,8 @@ routes = Api()
 
 @routes.route("/lookup/<string:reg>")
 @require_token(RPCGrantType.DVLALookup)
-def reg_lookup(reg: str):
-    result = rpc.providers["dvla"].lookup(reg)
+async def reg_lookup(reg: str):
+    result = await rpc.providers["dvla"].lookup(reg)
     return (
         result.str_basic,
         200,
@@ -18,8 +18,8 @@ def reg_lookup(reg: str):
 
 
 @routes.route("/lookup_inline/<string:reg>")
-def reg_lookup_inline(reg: str):
-    result = rpc.providers["dvla"].lookup(reg)
+async def reg_lookup_inline(reg: str):
+    result = await rpc.providers["dvla"].lookup(reg)
     if isinstance(result, DVLAVehicle):
         return (
             result.str_full,
