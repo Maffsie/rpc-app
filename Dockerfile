@@ -23,7 +23,6 @@ COPY --chown=nobody:daemon Makefile /app/
 COPY --chown=nobody:daemon resources.default /app/resources.default
 
 COPY --chown=nobody:daemon Pipfile /app/
-COPY --chown=nobody:daemon requirements /app/
 
 RUN make requirements
 

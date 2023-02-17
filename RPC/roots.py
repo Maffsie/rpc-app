@@ -23,9 +23,9 @@ class RPCRequest(Request):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         calling_frame = inspect.stack()[1]
-        callermod = calling_frame.frame.f_locals.get("__name__",
-                                                     type(calling_frame.frame.f_locals["self"])
-                                                     .__module__)
+        callermod = calling_frame.frame.f_locals.get(
+            "__name__", type(calling_frame.frame.f_locals["self"]).__module__
+        )
         self.log = Logger(context=callermod)
         self.log.info(self)
 
@@ -58,7 +58,9 @@ class Micro:
 class Api(Blueprint):
     log = None
 
-    def __init__(self, *args, url_prefix: str | None = None, auto: bool = False, **kwargs):
+    def __init__(
+        self, *args, url_prefix: str | None = None, auto: bool = False, **kwargs
+    ):
         """
         Subclass of `flask.Blueprint` with some QoL enhancements for automatic inferrence
         of name, import name, url prefix and automatic loading of child modules
@@ -92,7 +94,9 @@ class Api(Blueprint):
             self.find_routes()
 
     def register_blueprint(self, blueprint, *args, **kwargs):
-        self.log.info(f"Registering routes from {blueprint.name} on sub-prefix {blueprint.url_prefix}")
+        self.log.info(
+            f"Registering routes from {blueprint.name} on sub-prefix {blueprint.url_prefix}"
+        )
         super().register_blueprint(blueprint, *args, **kwargs)
 
     def find_routes(self):
@@ -101,16 +105,13 @@ class Api(Blueprint):
         """
         [
             self.register_blueprint(getattr(route, "routes"))
-            for route
-            in [
+            for route in [
                 import_module(name)
-                for _, name, _
-                in iter_modules([self.root_path], self.import_name + ".")
+                for _, name, _ in iter_modules([self.root_path], self.import_name + ".")
                 if name != self.import_name
                 and name.startswith(self.import_name.rpartition(".")[0] + ".")
             ]
-            if hasattr(route, "routes")
-            and not hasattr(route, "_no_auto")
+            if hasattr(route, "routes") and not hasattr(route, "_no_auto")
         ]
 
 

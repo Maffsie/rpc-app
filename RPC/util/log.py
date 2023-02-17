@@ -79,20 +79,20 @@ class Logger(Configurable):
             self.tags["sub_cid"] = str(self.cid)
 
         if context is not None:
-            self.tags['context'] = context
+            self.tags["context"] = context
         calling_frame = inspect.stack()[1]
-        callermod = calling_frame.frame.f_locals.get("__name__",
-                                                     type(calling_frame.frame.f_locals["self"])
-                                                     .__module__)
+        callermod = calling_frame.frame.f_locals.get(
+            "__name__", type(calling_frame.frame.f_locals["self"]).__module__
+        )
         self._logger = root_logger.getChild(callermod)
         # logging.captureWarnings(True)
 
     def get_logger(self, name: str | None = None) -> logging.Logger:
         if name is None:
             calling_frame = inspect.stack()[1]
-            name = calling_frame.frame.f_locals.get("__name__",
-                                                    type(calling_frame.frame.f_locals["self"])
-                                                    .__module__)
+            name = calling_frame.frame.f_locals.get(
+                "__name__", type(calling_frame.frame.f_locals["self"]).__module__
+            )
         return self._logger.getChild(name)
 
     def write(self, level: LogLevel, msg: str, *args, **kwargs):
@@ -110,100 +110,121 @@ class Logger(Configurable):
 
     def _extra(self, extra: dict, icontext: str | None = None) -> dict:
         if len(self.tags) > 0 or icontext is not None:
-            extra['tags'] = self.tags
+            extra["tags"] = self.tags
         if icontext is not None:
-            extra['tags']['inst_context'] = icontext
+            extra["tags"]["inst_context"] = icontext
         return extra
 
     def debug(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.debug(
             msg,
-            extra=self._extra({
-                "extra_args": [
-                    *args,
-                ],
-                "extra_kwargs": {
-                    **kwargs,
+            extra=self._extra(
+                {
+                    "extra_args": [
+                        *args,
+                    ],
+                    "extra_kwargs": {
+                        **kwargs,
+                    },
                 },
-            }, icontext),
+                icontext,
+            ),
         )
 
     def verbose(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.log(
             15,
             msg,
-            extra=self._extra({
-                "extra_args": [
-                    *args,
-                ],
-                "extra_kwargs": {
-                    **kwargs,
+            extra=self._extra(
+                {
+                    "extra_args": [
+                        *args,
+                    ],
+                    "extra_kwargs": {
+                        **kwargs,
+                    },
                 },
-            }, icontext),
+                icontext,
+            ),
         )
 
     def info(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.info(
             msg,
-            extra=self._extra({
-                "extra_args": [
-                    *args,
-                ],
-                "extra_kwargs": {
-                    **kwargs,
+            extra=self._extra(
+                {
+                    "extra_args": [
+                        *args,
+                    ],
+                    "extra_kwargs": {
+                        **kwargs,
+                    },
                 },
-            }, icontext),
+                icontext,
+            ),
         )
 
     def notice(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.log(
             25,
             msg,
-            extra=self._extra({
-                "extra_args": [
-                    *args,
-                ],
-                "extra_kwargs": {
-                    **kwargs,
+            extra=self._extra(
+                {
+                    "extra_args": [
+                        *args,
+                    ],
+                    "extra_kwargs": {
+                        **kwargs,
+                    },
                 },
-            }, icontext),
+                icontext,
+            ),
         )
 
     def warn(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.warning(
             msg,
-            extra=self._extra({
-                "extra_args": [
-                    *args,
-                ],
-                "extra_kwargs": {
-                    **kwargs,
+            extra=self._extra(
+                {
+                    "extra_args": [
+                        *args,
+                    ],
+                    "extra_kwargs": {
+                        **kwargs,
+                    },
                 },
-            }, icontext),
+                icontext,
+            ),
         )
 
     def error(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.error(
             msg,
-            extra=self._extra({
-                "extra_args": [
-                    *args,
-                ],
-                "extra_kwargs": {
-                    **kwargs,
+            extra=self._extra(
+                {
+                    "extra_args": [
+                        *args,
+                    ],
+                    "extra_kwargs": {
+                        **kwargs,
+                    },
                 },
-            }, icontext),
+                icontext,
+            ),
         )
 
     def fatal(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.critical(
             msg,
-            extra=self._extra({
-                "extra_args": [
-                    *args,
-                ],
-                "extra_kwargs": {
-                    **kwargs,
+            extra=self._extra(
+                {
+                    "extra_args": [
+                        *args,
+                    ],
+                    "extra_kwargs": {
+                        **kwargs,
+                    },
                 },
-            }, icontext),
+                icontext,
+            ),
         )

@@ -27,10 +27,7 @@ def preconfigure(
     [loadenv(dotenv_path=fp) for fp in conf_file]
     # Need to error-check this
     try:
-        [
-            [loadenv(dotenv_path=f"{p}/{fn}") for fn in listdir(p)]
-            for p in conf_paths
-        ]
+        [[loadenv(dotenv_path=f"{p}/{fn}") for fn in listdir(p)] for p in conf_paths]
     except FileNotFoundError:
         pass
 

@@ -135,8 +135,7 @@ class Tailzone(Configurable):
                     and record.type in ("A", "AAAA")
                 )
                 or (
-                    record.name
-                    == self.app_config.get("tailzone_do_record")
+                    record.name == self.app_config.get("tailzone_do_record")
                     and record.type == "TXT"
                     and record.data.lower() in [*orphaned, *removable]
                 )

@@ -27,17 +27,17 @@ class RPCApp(Base, Flask):
         self.find_routes()
 
     def register_blueprint(self, blueprint, *args, **kwargs):
-        self.log.info(f"Registering base API {blueprint.name} on {blueprint.url_prefix}")
+        self.log.info(
+            f"Registering base API {blueprint.name} on {blueprint.url_prefix}"
+        )
         super().register_blueprint(blueprint, *args, **kwargs)
 
     def find_routes(self):
         [
             self.register_blueprint(getattr(api, "api"))
-            for api
-            in [
+            for api in [
                 import_module(name)
-                for _, name, _
-                in iter_modules([self.root_path], "RPC.")
+                for _, name, _ in iter_modules([self.root_path], "RPC.")
                 if name.startswith("RPC.v")
             ]
             if hasattr(api, "api")
