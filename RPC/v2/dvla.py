@@ -21,8 +21,5 @@ def reg_lookup(reg: str):
 def reg_lookup_inline(reg: str):
     result = rpc.providers["dvla"].lookup(reg)
     if isinstance(result, DVLAVehicle):
-        return (
-            result.str_full,
-            200
-        )
+        return (result.str_full, 200)
     return result, 404

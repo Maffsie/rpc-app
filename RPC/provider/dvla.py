@@ -1,7 +1,7 @@
 from json import JSONDecodeError
 from re import compile
 
-from RPC.helper import Configurable, throws, validator, WithLogging
+from RPC.helper import Configurable, WithLogging, throws, validator
 from RPC.models import DVLAError, DVLAVehicle
 from RPC.roots import IApi
 from RPC.util.errors import InternalOperationalError, InvalidInputError

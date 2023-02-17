@@ -47,7 +47,9 @@ def load_conf_static(conf, errno, errdesc):
         deftype = default
         if isinstance(deftype, type):
             default = None
-        value = coerce_type(environ.get(name.upper(), environ.get(name, default)), deftype)
+        value = coerce_type(
+            environ.get(name.upper(), environ.get(name, default)), deftype
+        )
         # warn(f"env ${name}? {type(value)} '{value}' : {deftype} '{default}'")
         err = errno.get(name, None)
         err_d = errdesc.get(err, "no descriptor for this errno")

@@ -70,4 +70,3 @@ class TelegramInlineRequest:
             "cache_time": 86400,
             "results": self.responses,
         }
-

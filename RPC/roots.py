@@ -66,16 +66,18 @@ class Api(Blueprint):
             self.find_routes()
 
     def find_routes(self):
-        _routes = [import_module(name)
-                   for _, name, _
-                   in iter_modules([self.root_path], self.import_name+".")
-                   if name != self.import_name
-                   and name.startswith(self.import_name.rpartition(".")[0]+".")
-                   and "._" not in name]
-        [self.register_blueprint(getattr(route, "routes"))
-         for route in _routes
-         if hasattr(route, "routes")]
-
+        _routes = [
+            import_module(name)
+            for _, name, _ in iter_modules([self.root_path], self.import_name + ".")
+            if name != self.import_name
+            and name.startswith(self.import_name.rpartition(".")[0] + ".")
+            and "._" not in name
+        ]
+        [
+            self.register_blueprint(getattr(route, "routes"))
+            for route in _routes
+            if hasattr(route, "routes")
+        ]
 
     def include(self, *args):
         [self.register_blueprint(api) for api in args]

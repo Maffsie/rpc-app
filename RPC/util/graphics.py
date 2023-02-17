@@ -1,5 +1,4 @@
-from PIL import Image, ImageChops
-from PIL import ImageFont
+from PIL import Image, ImageChops, ImageFont
 
 from RPC.helper import impose_text
 from RPC.util.errors import ImageGenerationError
@@ -69,19 +68,35 @@ def inner_render_rdj(impose: str, inline_id: int, suffix: int):
 def inline_render_rdj(impose: str, inline_id: str, suffix: int):
     render_rdj(impose, inline_id, suffix)
     prefix = f"https://rpc.puppy.network/v2/memes/renders"
-    return ([
-        f"{prefix}/{inline_id}.{suffix}",
-        f"{prefix}/{inline_id}.{suffix}.t",
-    ], (677, 600,), "rdj", suffix)
+    return (
+        [
+            f"{prefix}/{inline_id}.{suffix}",
+            f"{prefix}/{inline_id}.{suffix}.t",
+        ],
+        (
+            677,
+            600,
+        ),
+        "rdj",
+        suffix,
+    )
 
 
 def inline_render_chad(impose: str, inline_id: str, suffix: int):
     render_chad(impose, inline_id, suffix)
     prefix = f"https://rpc.puppy.network/v2/memes/renders"
-    return ([
-        f"{prefix}/{inline_id}.{suffix}",
-        f"{prefix}/{inline_id}.{suffix}.t",
-    ], (585, 525,), "chad", suffix)
+    return (
+        [
+            f"{prefix}/{inline_id}.{suffix}",
+            f"{prefix}/{inline_id}.{suffix}.t",
+        ],
+        (
+            585,
+            525,
+        ),
+        "chad",
+        suffix,
+    )
 
 
 def render_rdj(*args, **kwargs):

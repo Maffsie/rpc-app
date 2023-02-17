@@ -4,7 +4,6 @@ from requests import Response
 
 from RPC.util.coercion import coerce_type
 
-
 # Hacky way of making manufacturer names less nasty
 acronym_mfrs = (
     "A.S.A",
@@ -448,7 +447,10 @@ class DVLAVehicle:
         self.art_end_date = ves_response.get("artEndDate", None)
 
         self.moted = coerce_type(ves_response.get("motStatus", None), bool)
-        if self.moted is not None and ves_response.get("motExpiryDate", None) is not None:
+        if (
+            self.moted is not None
+            and ves_response.get("motExpiryDate", None) is not None
+        ):
             self.mot_until_year = coerce_type(
                 ves_response["motExpiryDate"].split("-")[0], int
             )
@@ -517,7 +519,12 @@ class DVLAVehicle:
 
     @property
     def str_euro_and_emissions(self) -> str:
-        if not self.emissions and not self.capacity and not self.emissions_real and not self.euro:
+        if (
+            not self.emissions
+            and not self.capacity
+            and not self.emissions_real
+            and not self.euro
+        ):
             return (
                 "The DVLA has no records or recorded European Emissions Standard band rating"
                 "for this vehicle."
@@ -586,4 +593,3 @@ class DVLAVehicle:
             f"Vehicle logbook (V5C) was last issued "
             f"{self.vfivec_year}/{self.vfivec_month}/{self.vfivec_day}."
         )
-

@@ -63,7 +63,6 @@ def try_fit_text(
     spacing: int = 4,
     direction: str = "ltr",
 ) -> Optional[str]:
-
     words = text.split()
 
     line_height = font.size
@@ -182,4 +181,3 @@ def impose_text(
         else:
             imposer.save(buf, "PNG")
     return buf
-

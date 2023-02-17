@@ -24,7 +24,7 @@ class Switchbot(Configurable, WithLogging, IApi):
         return []
 
     def device(self, device_id: str) -> dict:
-        #/devices/{device_id}/status
+        # /devices/{device_id}/status
         return {}
 
     def command(self, device_id: str, cmd: str) -> dict:
@@ -33,8 +33,10 @@ class Switchbot(Configurable, WithLogging, IApi):
     @property
     def scenes(self) -> [dict]:
         res = self.get("/scenes")
-        return [{"id": scene["sceneId"], "name": scene["sceneName"]}
-                for scene in res.json()["body"]]
+        return [
+            {"id": scene["sceneId"], "name": scene["sceneName"]}
+            for scene in res.json()["body"]
+        ]
 
     def execute(self, scene_id: str) -> bool:
         res = self.post(f"/scenes/{scene_id}/execute")

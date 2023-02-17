@@ -23,10 +23,11 @@ class RPCApp(Base, Flask):
         self.find_routes()
 
     def find_routes(self):
-        _routes = [getattr(import_module(name), "api")
-                   for _, name, _
-                   in iter_modules([self.root_path], "RPC.")
-                   if name.startswith("RPC.v")]
+        _routes = [
+            getattr(import_module(name), "api")
+            for _, name, _ in iter_modules([self.root_path], "RPC.")
+            if name.startswith("RPC.v")
+        ]
         [self.register_blueprint(api) for api in _routes]
 
     def setup_providers(self):

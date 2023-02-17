@@ -6,8 +6,8 @@ from uuid import uuid1 as uuid
 
 from logging_loki import LokiHandler
 
-from RPC.util.coercion import coerce_type
 from RPC.helper import Configurable
+from RPC.util.coercion import coerce_type
 
 
 class LogLevel(Enum):

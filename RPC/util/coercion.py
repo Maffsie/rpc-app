@@ -79,7 +79,6 @@ def coerce_type(have: Any, want: T, need: bool = False) -> T:
             try:
                 return want(have)
             except ValueError:
-
                 # Enum[Item] returns the enum member corresponding to the name
                 #  ie. for Example(Enum): A=1, Example['A'] will return Example.A
                 #  and Example[1] will throw a KeyError

@@ -75,8 +75,12 @@ def inline_req():
         raise InternalOperationalError(f"something went wrong: {e}")
     if not req.honour_request:
         raise DishonourableError("fuck you :)")
-    req.append_response(*inline_render_chad(impose=req.content, inline_id=req.inline_id, suffix=0))
-    req.append_response(*inline_render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1))
+    req.append_response(
+        *inline_render_chad(impose=req.content, inline_id=req.inline_id, suffix=0)
+    )
+    req.append_response(
+        *inline_render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1)
+    )
     return req.jdict
 
 
