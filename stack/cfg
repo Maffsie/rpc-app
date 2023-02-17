@@ -1,0 +1,15 @@
+LOKI_URL=http://loki/loki/api/v1/push
+
+OCTOPUS_GASFAC=0
+OCTOPUS_DB=energy_octopus
+
+TAILZONE_DO_DOMAIN=your.domain
+TAILZONE_DO_RECORD=_tailzone_managed
+TAILZONE_TS_NET=your@tailscale.tailnet
+TAILZONE_TS_TAG=publish
+
+DB_INFLUX_HOST=influxdb
+DB_INFLUX_PORT=8086
+DB_INFLUX_TLS=False
+DB_INFLUX_VERIFYTLS=False
+DB_INFLUX_AUTH=False

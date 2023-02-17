@@ -1,0 +1,40 @@
+version: '3.8'
+services:
+  rpc:
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 1
+        order: start-first
+        delay: 5s
+      restart_policy:
+        condition: any
+    image: commit.pup.cloud/maff/rpc:latest
+    networks:
+      - inside
+    environment:
+      TZ: Europe/London
+    secrets:
+      - rpc_keys
+    configs:
+      - source: rpc_cfg
+        target: /run/configs/rpc_cfg
+        mode: 0444
+networks:
+  inside:
+    internal: true
+# create a Docker config with the contents of the `cfg` file
+#  adjusted to your needs
+# then put the name of it here (version number recommended)
+configs:
+  rpc_cfg:
+    external:
+      name: rpc_cfg_1
+# create a Docker secret with the contents of the `keys` file
+#  adjusted to your needs
+# then put the name of it here (version number recommended)
+secrets:
+  rpc_keys:
+    external:
+      name: rpc_keys_1

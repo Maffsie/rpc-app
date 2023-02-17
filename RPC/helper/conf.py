@@ -10,7 +10,9 @@ from RPC.util.coercion import coerce_type
 def preconfigure(
     conf_file: List[str] = [
         "./env",
+        "./.env",
         "/env",
+        "/.env",
     ],
     conf_paths: List[str] = [
         "/conf",
