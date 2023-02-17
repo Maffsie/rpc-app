@@ -13,29 +13,29 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
     app_config = {
         "cron_octopus_period": int,
         "cron_octopus_apinum": 1000,
-        "vnd_octopus_apikey": str,
-        "vnd_octopus_elecsn": str,
-        "vnd_octopus_gassn": str,
-        "vnd_octopus_gasfac": float(0),
-        "vnd_octopus_mpan": str,
-        "vnd_octopus_mprn": str,
+        "octopus_apikey": str,
+        "octopus_elecsn": str,
+        "octopus_gassn": str,
+        "octopus_gasfac": float(0),
+        "octopus_mpan": str,
+        "octopus_mprn": str,
     }
 
     uris = {
         "electricity": [
             "https://api.octopus.energy/v1/electricity-meter-points/%s/meters/%s/consumption/",
-            "cron_octopus_mpan",
-            "cron_octopus_elecsn",
+            "octopus_mpan",
+            "octopus_elecsn",
         ],
         "gas": [
             "https://api.octopus.energy/v1/gas-meter-points/%s/meters/%s/consumption/",
-            "cron_octopus_mprn",
-            "cron_octopus_gassn",
+            "octopus_mprn",
+            "octopus_gassn",
         ],
     }
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, ctx="vnd.Octopussy", dbvar="cron_octopus_db", **kwargs)
+        super().__init__(*args, ctx="vnd.Octopussy", dbvar="octopus_db", **kwargs)
 
     def load_series(self, uri, dt_from=None, dt_to=None, page=None):
         """
@@ -49,7 +49,7 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
         if page is not None:
             params["page"] = page
         resp = get(
-            uri, params=params, auth=(self.app_config.get("octopus_api_key"), "")
+            uri, params=params, auth=(self.app_config.get("octopus_apikey"), "")
         )
         resp.raise_for_status()
         res = resp.json()
@@ -76,7 +76,7 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
             f"SELECT time, raw_consumption FROM {series} ORDER BY time DESC LIMIT 1"
         )
         if (
-            not self.app_config.get("influxdb_reset_db_contents", False)
+            not self.app_config.get("db_influx_reset_db_contents", False)
             and "series" in resp.raw
             and "values" in resp.raw["series"][0]
             and len(resp.raw["series"][0]["values"]) > 0
@@ -84,7 +84,7 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
             dt_from = resp.raw["series"][0]["values"][0][0]
             self.log.info(f"Newest data for {series} from {dt_from}.")
         else:
-            if self.app_config.get("influxdb_reset_db_contents", False):
+            if self.app_config.get("db_influx_reset_db_contents", False):
                 self.log.warning(
                     f"Resetting data for {series}, as the reset flag was set",
                 )
@@ -117,7 +117,7 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
                 "tags": _tags(measurement),
                 "time": measurement["interval_end"],
                 "fields": _fields(
-                    measurement, self.app_config.get("cron_octopus_gasfac")
+                    measurement, self.app_config.get("octopus_gasfac")
                 ),
             }
             for measurement in metrics
@@ -136,3 +136,6 @@ class Octopussy(WithInfluxDB, WithLogging, Configurable):
                 *self.load_dt(series),
             ),
         )
+
+
+p_cls = Octopussy

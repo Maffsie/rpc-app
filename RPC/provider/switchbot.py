@@ -41,3 +41,6 @@ class Switchbot(Configurable, WithLogging, IApi):
     def execute(self, scene_id: str) -> bool:
         res = self.post(f"/scenes/{scene_id}/execute")
         return res.json()["message"] == "success"
+
+
+p_cls = Switchbot

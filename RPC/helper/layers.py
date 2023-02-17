@@ -26,22 +26,22 @@ class WithDBConf:
 class WithInfluxDB(WithDBConf):
     dbi: InfluxDBClient = None
     dbo_conf = {
-        "data_influx_host": str,
-        "data_influx_port": 8086,
-        "data_influx_tls": False,
-        "data_influx_verifytls": False,
-        "data_influx_auth": bool,
-        "data_influx_user": str,
-        "data_influx_pass": str,
+        "db_influx_host": str,
+        "db_influx_port": 8086,
+        "db_influx_tls": False,
+        "db_influx_verifytls": False,
+        "db_influx_auth": bool,
+        "db_influx_user": str,
+        "db_influx_pass": str,
     }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.dbi = InfluxDBClient(
-            host=self.dbo_conf.get("data_influxdb_host"),
-            port=self.dbo_conf.get("data_influxdb_port"),
-            ssl=self.dbo_conf.get("data_influxdb_tls"),
-            verify_ssl=self.dbo_conf.get("data_influxdb_tlsverify"),
+            host=self.dbo_conf.get("db_influx_host"),
+            port=self.dbo_conf.get("db_influx_port"),
+            ssl=self.dbo_conf.get("db_influx_tls"),
+            verify_ssl=self.dbo_conf.get("db_influx_tlsverify"),
             database=self.dbo_conf.get("_db"),
         )
 

@@ -1,6 +1,6 @@
+import inspect
 import logging
 from enum import Enum
-from typing import Union
 from uuid import UUID
 from uuid import uuid1 as uuid
 
@@ -45,31 +45,54 @@ class Logger(Configurable):
         "FLUUNSET": "LOKI_URL not set! Hint: it should be <loki-host>/loki/api/v1/push",
     }
 
+    tags: dict
+
     def __init__(
         self,
         *args,
-        correlation_id: Union[UUID, None] = None,
+        context: str | None = None,
+        correlation_id: UUID | None = None,
         debug: bool = False,
         **kwargs,
     ):
+        self.tags = {}
         self.cid = correlation_id if correlation_id is not None else uuid()
         super().__init__(*args, **kwargs)
         if debug:
             self.app_config["debug"] = debug
-        self._logger = logging.getLogger(str(self.cid))
-        self._logger.setLevel("DEBUG" if self.app_config.get("debug") else "INFO")
-        self._logger.addHandler(
-            LokiHandler(
-                url=self.app_config.get("loki_url"),
-                tags={
-                    "app": "RPC",
-                },
-                version="1",
+
+        # Set up root logger
+        root_logger = logging.getLogger()
+        if LokiHandler not in [type(h) for h in root_logger.handlers]:
+            root_logger.setLevel("DEBUG" if self.app_config.get("debug") else "INFO")
+            root_logger.addHandler(
+                LokiHandler(
+                    url=self.app_config.get("loki_url"),
+                    tags={
+                        "app": "RPC",
+                        "cid": str(self.cid),
+                    },
+                    version="1",
+                )
             )
-        )
+        else:
+            self.tags["sub_cid"] = str(self.cid)
+
+        if context is not None:
+            self.tags['context'] = context
+        calling_frame = inspect.stack()[1]
+        callermod = calling_frame.frame.f_locals.get("__name__",
+                                                     type(calling_frame.frame.f_locals["self"])
+                                                     .__module__)
+        self._logger = root_logger.getChild(callermod)
         # logging.captureWarnings(True)
 
-    def get_logger(self, name: str) -> logging.Logger:
+    def get_logger(self, name: str | None = None) -> logging.Logger:
+        if name is None:
+            calling_frame = inspect.stack()[1]
+            name = calling_frame.frame.f_locals.get("__name__",
+                                                    type(calling_frame.frame.f_locals["self"])
+                                                    .__module__)
         return self._logger.getChild(name)
 
     def write(self, level: LogLevel, msg: str, *args, **kwargs):
@@ -85,116 +108,102 @@ class Logger(Configurable):
         print("don't use me i'm too gay")
         raise Exception("fuckin hell")
 
-    def debug(self, msg, *args, **kwargs):
+    def _extra(self, extra: dict, icontext: str | None = None) -> dict:
+        if len(self.tags) > 0 or icontext is not None:
+            extra['tags'] = self.tags
+        if icontext is not None:
+            extra['tags']['inst_context'] = icontext
+        return extra
+
+    def debug(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.debug(
             msg,
-            extra={
-                "tags": {
-                    "correlation_id": str(self.cid),
-                },
+            extra=self._extra({
                 "extra_args": [
                     *args,
                 ],
                 "extra_kwargs": {
                     **kwargs,
                 },
-            },
+            }, icontext),
         )
 
-    def verbose(self, msg, *args, **kwargs):
+    def verbose(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.log(
             15,
             msg,
-            extra={
-                "tags": {
-                    "correlation_id": str(self.cid),
-                },
+            extra=self._extra({
                 "extra_args": [
                     *args,
                 ],
                 "extra_kwargs": {
                     **kwargs,
                 },
-            },
+            }, icontext),
         )
 
-    def info(self, msg, *args, **kwargs):
+    def info(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.info(
             msg,
-            extra={
-                "tags": {
-                    "correlation_id": str(self.cid),
-                },
+            extra=self._extra({
                 "extra_args": [
                     *args,
                 ],
                 "extra_kwargs": {
                     **kwargs,
                 },
-            },
+            }, icontext),
         )
 
-    def notice(self, msg, *args, **kwargs):
+    def notice(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.log(
             25,
             msg,
-            extra={
-                "tags": {
-                    "correlation_id": str(self.cid),
-                },
+            extra=self._extra({
                 "extra_args": [
                     *args,
                 ],
                 "extra_kwargs": {
                     **kwargs,
                 },
-            },
+            }, icontext),
         )
 
-    def warn(self, msg, *args, **kwargs):
+    def warn(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.warning(
             msg,
-            extra={
-                "tags": {
-                    "correlation_id": str(self.cid),
-                },
+            extra=self._extra({
                 "extra_args": [
                     *args,
                 ],
                 "extra_kwargs": {
                     **kwargs,
                 },
-            },
+            }, icontext),
         )
 
-    def error(self, msg, *args, **kwargs):
+    def error(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.error(
             msg,
-            extra={
-                "tags": {
-                    "correlation_id": str(self.cid),
-                },
+            extra=self._extra({
                 "extra_args": [
                     *args,
                 ],
                 "extra_kwargs": {
                     **kwargs,
                 },
-            },
+            }, icontext),
         )
 
-    def fatal(self, msg, *args, **kwargs):
+    def fatal(self, msg, *args, icontext: str | None = None, **kwargs):
         self._logger.critical(
             msg,
-            extra={
-                "tags": {
-                    "correlation_id": str(self.cid),
-                },
+            extra=self._extra({
                 "extra_args": [
                     *args,
                 ],
                 "extra_kwargs": {
                     **kwargs,
                 },
-            },
+            }, icontext),
         )

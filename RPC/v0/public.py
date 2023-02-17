@@ -8,6 +8,7 @@ from RPC.util.coercion import coerce_type
 from RPC.util.errors import ImageGenerationError, InvalidInputError, MissingFileError
 from RPC.util.graphics import render_rdj
 
+_no_auto = True
 routes = Api()
 
 

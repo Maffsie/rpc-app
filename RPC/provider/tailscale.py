@@ -8,20 +8,18 @@ from RPC.helper import Configurable
 
 class Tailzone(Configurable):
     app_config = {
-        "debug": False,
-        "base_uri": str,
-        "vnd_tailscale_apikey": str,
-        "vnd_tailscale_tailnet": str,
-        "vnd_tailscale_tag": str,
-        "vnd_digitalocean_apikey": str,
-        "vnd_digitalocean_domain": str,
-        "vnd_digitalocean_managed_record": "_tailzone_managed",
+        "tailscale_apikey": str,
+        "tailzone_ts_net": str,
+        "tailzone_ts_tag": str,
+        "digitalocean_apikey": str,
+        "tailzone_do_domain": str,
+        "tailzone_do_record": "_tailzone_managed",
     }
 
     async def get_devices(self):
         network = Tailscale(
-            api_key=self.app_config.get("vnd_tailscale_apikey"),
-            tailnet=self.app_config.get("vnd_tailscale_tailnet"),
+            api_key=self.app_config.get("tailscale_apikey"),
+            tailnet=self.app_config.get("tailzone_ts_net"),
         )
 
         # TODO: external devices do not have tags,
@@ -76,8 +74,8 @@ class Tailzone(Configurable):
         results["poll_stats"]["count_tailscale_devices"] = len(devices)
 
         domain = DOdomain(
-            token=self.app_config.get("vnd_digitalocean_apikey"),
-            name=self.app_config.get("vnd_digitalocean_domain"),
+            token=self.app_config.get("digitalocean_apikey"),
+            name=self.app_config.get("tailzone_do_domain"),
         )
         records = domain.get_records()
         results["poll_stats"]["count_dns_records"] = len(records)
@@ -88,7 +86,7 @@ class Tailzone(Configurable):
         managed = [
             record.data.lower()
             for record in records
-            if record.name == self.app_config.get("vnd_digitalocean_managed_record")
+            if record.name == self.app_config.get("tailzone_do_record")
             and record.type == "TXT"
         ]
         results["poll_stats"]["count_existing_managed"] = len(managed)
@@ -96,7 +94,7 @@ class Tailzone(Configurable):
         pending = [
             host
             for host in devices
-            if f"tag:{self.app_config.get('vnd_tailscale_tag')}" in host["tags"]
+            if f"tag:{self.app_config.get('tailzone_ts_tag')}" in host["tags"]
             and host["host"] not in managed
         ]
         results["poll_stats"]["count_existing_pending"] = len(pending)
@@ -104,7 +102,7 @@ class Tailzone(Configurable):
         removable = [
             host["host"]
             for host in devices
-            if f"tag:{self.app_config.get('vnd_tailscale_tag')}" not in host["tags"]
+            if f"tag:{self.app_config.get('tailzone_ts_tag')}" not in host["tags"]
             and host["host"] in managed
         ]
         results["poll_stats"]["count_removable_managed"] = len(removable)
@@ -138,7 +136,7 @@ class Tailzone(Configurable):
                 )
                 or (
                     record.name
-                    == self.app_config.get("vnd_digitalocean_managed_record")
+                    == self.app_config.get("tailzone_do_record")
                     and record.type == "TXT"
                     and record.data.lower() in [*orphaned, *removable]
                 )
@@ -166,7 +164,7 @@ class Tailzone(Configurable):
                     "name": host["host"],
                     "result": domain.create_new_domain_record(
                         type="TXT",
-                        name=self.conf.get("vnd_digitalocean_managed_record"),
+                        name=self.app_config.get("tailzone_do_record"),
                         data=host["host"],
                     ),
                 }
@@ -181,3 +179,6 @@ class Tailzone(Configurable):
             )
 
         return
+
+
+p_cls = Tailzone

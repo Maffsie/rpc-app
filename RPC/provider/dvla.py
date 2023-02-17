@@ -12,18 +12,18 @@ v_regnum = compile("^[a-zA-Z0-9]+$")
 
 class Doovla(Configurable, WithLogging, IApi):
     app_config = {
-        "doovla_api_key": str,
-        "doovla_api_endpoint": "https://driver-vehicle-licensing.api.gov.uk",
+        "dvla_apikey": str,
+        "dvla_api_endpoint": "https://driver-vehicle-licensing.api.gov.uk",
     }
     errnos = {
-        "DOOVLA_API_KEY": "FDVLAAK",
+        "DVLA_APIKEY": "FDVLAAK",
     }
     errdes = {"FDVLAAK": "No API key present for the DVLA!"}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.baseurl = self.app_config.get("doovla_api_endpoint")
-        self.headers["x-api-key"] = self.app_config.get("doovla_api_key")
+        self.baseurl = self.app_config.get("dvla_api_endpoint")
+        self.headers["x-api-key"] = self.app_config.get("dvla_apikey")
 
     @throws(InvalidInputError, InternalOperationalError)
     @validator(lambda x: v_regnum.match(x) is not None)
@@ -40,3 +40,6 @@ class Doovla(Configurable, WithLogging, IApi):
             return DVLAError(resp)
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)
+
+
+p_cls = Doovla
