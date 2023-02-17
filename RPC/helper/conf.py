@@ -26,10 +26,11 @@ def preconfigure(
     # No need to error-check this, dotenv handles it fine
     [loadenv(dotenv_path=fp) for fp in conf_file]
     # Need to error-check this
-    try:
-        [[loadenv(dotenv_path=f"{p}/{fn}") for fn in listdir(p)] for p in conf_paths]
-    except FileNotFoundError:
-        pass
+    for path in conf_paths:
+        try:
+            [loadenv(dotenv_path=f"{path}/{filename}") for filename in listdir(path)]
+        except FileNotFoundError:
+            pass
 
 
 def load_conf_static(conf, errno, errdesc):
