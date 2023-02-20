@@ -3,7 +3,42 @@ from functools import wraps
 from flask import Response, current_app, request
 
 from RPC.models.auth import RPCGrantType
-from RPC.util.errors import AuthRequiredError, InvalidInputError, RPCException
+from RPC.util.coercion import coerce_type
+from RPC.util.errors import (
+    AuthRequiredError,
+    InternalOperationalError,
+    InvalidInputError,
+    RPCException,
+)
+
+
+def coerce_args(pair: list[tuple[int | str, type]]):
+    """Attempts to enforce type coercion for arguments to the wrapped function.
+    Possible enhancement: autodetection of types based on typehints of wrapped function
+
+    :arg pair: a pairing of argument number and type
+    :type pair: list[tuple[int | str, type]]
+    """
+
+    def wrapper(func):
+        @wraps(func)
+        def call(*args, **kwargs):
+            for arg, c_to in pair:
+                if isinstance(arg, int):
+                    if arg > len(args):
+                        raise InternalOperationalError("arg!")
+                    args = list(args)
+                    args[arg] = coerce_type(args[arg], c_to)
+                    args = tuple(args)
+                if isinstance(arg, str):
+                    if kwargs.get(arg, None) is None:
+                        raise InternalOperationalError("kwarg!")
+                    kwargs[arg] = coerce_type(kwargs.get(arg, None), c_to)
+            return func(*args, **kwargs)
+
+        return call
+
+    return wrapper
 
 
 def throws(*etypes):

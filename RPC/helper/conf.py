@@ -1,36 +1,53 @@
 from os import environ, listdir
-from typing import List
+from pathlib import Path
 from warnings import warn
 
-from dotenv import load_dotenv as loadenv
+from dotenv import load_dotenv
 
 from RPC.util.coercion import coerce_type
+from RPC.util.errors import RPCInitialisationException
+
+from .decorators import coerce_args
+
+search_files = ["/env", "/.env", "./env", "./.env"]
+search_paths = [
+    "/configs",
+    "/run/configs",
+    "/run/secrets",
+    "/secrets",
+    "/var/run/configs",
+    "/var/run/secrets",
+]
 
 
-def preconfigure(
-    conf_file: List[str] = [
-        "./env",
-        "./.env",
-        "/env",
-        "/.env",
-    ],
-    conf_paths: List[str] = [
-        "/conf",
-        "/confs",
-        "/config",
-        "/secret",
-        "/secrets",
-        "/run/config",
-        "/run/configs",
-        "/run/secrets",
-    ],
-):
+def preconfigure(conf_file=search_files, conf_paths=search_paths):
+    @coerce_args([(0, Path)])
+    def _preconf_one(path: Path):
+        if not path.exists():
+            return
+        if not path.is_dir():
+            return load_dotenv(dotenv_path=path.resolve())
+        for file in listdir(path.resolve()):
+            load_dotenv(dotenv_path=file)
+
+    if coerce_type(environ.get("NO_CONF_FILES", False), bool):
+        return
+    _ = [_preconf_one(path) for path in [*conf_file, *conf_paths]]
+
+    if len([*conf_file, *conf_paths]) == 0:
+        raise RPCInitialisationException(
+            "No config files could be found! Please supply some, "
+            "or set environment variable NO_CONF_FILES=True"
+        )
     # No need to error-check this, dotenv handles it fine
-    [loadenv(dotenv_path=fp) for fp in conf_file]
+    [load_dotenv(dotenv_path=fp) for fp in conf_file]
     # Need to error-check this
     for path in conf_paths:
         try:
-            [loadenv(dotenv_path=f"{path}/{filename}") for filename in listdir(path)]
+            [
+                load_dotenv(dotenv_path=f"{path}/{filename}")
+                for filename in listdir(path)
+            ]
         except FileNotFoundError:
             pass
 

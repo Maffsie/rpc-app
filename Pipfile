@@ -19,6 +19,7 @@ python-dateutil = "*"
 requests = "*"
 # vnd.tailscale
 tailscale = "*"
+pydantic = "*"
 
 [dev-packages]
 black = "*"

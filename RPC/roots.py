@@ -27,7 +27,6 @@ class RPCRequest(Request):
             "__name__", type(calling_frame.frame.f_locals["self"]).__module__
         )
         self.log = Logger(context=callermod)
-        self.log.info(self)
 
 
 class Micro:

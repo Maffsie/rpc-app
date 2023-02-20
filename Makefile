@@ -153,6 +153,7 @@ gunicorn-run: $(RESTGTS) banner
 healthcheck:
 	$(ENVBIN) curl -s http://127.0.0.1:8080/ping | $(ENVBIN) grep 'pong'
 	$(ENVBIN) curl -s http://127.0.0.1:8080/v1/health/alive | $(ENVBIN) grep 'alive!'
+	$(ENVBIN) curl -s http://127.0.0.1:8080/v2/health/alive | $(ENVBIN) grep 'alive!'
 
 # Outputs a fun lil banner.
 banner:
