@@ -1,6 +1,5 @@
 import inspect
 from importlib import import_module
-from logging import getLogger
 from pkgutil import iter_modules
 from uuid import UUID
 

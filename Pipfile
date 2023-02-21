@@ -7,19 +7,20 @@ name = "pypi"
 # core dependencies
 flask = "*"
 gunicorn = "*"
+pydantic = "*"
 python-dotenv = "*"
 python-logging-loki = "*"
-# cron.tailzone
+requests = "*"
+# provider.Tailzone
 python-digitalocean = "*"
+tailscale = "*"
+# service.TBot
+python-telegram-bot = "*"
 # util.graphics
 pillow = "*"
-# vnd.octopus
+# provider.Octopussy
 influxdb = "*"
 python-dateutil = "*"
-requests = "*"
-# vnd.tailscale
-tailscale = "*"
-pydantic = "*"
 
 [dev-packages]
 black = "*"
