@@ -112,7 +112,8 @@ class Logger(Configurable):
         extra["tags"] = self.tags
         if icontext is not None:
             extra["tags"]["inst_context"] = icontext
-        extra["tags"]["extra"] = extra["extra_args"]
+        if len(extra["extra_args"]) > 0:
+            extra["tags"]["extra"] = extra["extra_args"]
         extra["tags"].update(extra["extra_kwargs"])
         return extra
 
