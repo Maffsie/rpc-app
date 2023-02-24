@@ -109,10 +109,11 @@ class Logger(Configurable):
         raise Exception("fuckin hell")
 
     def _extra(self, extra: dict, icontext: str | None = None) -> dict:
-        if len(self.tags) > 0 or icontext is not None:
-            extra["tags"] = self.tags
+        extra["tags"] = self.tags
         if icontext is not None:
             extra["tags"]["inst_context"] = icontext
+        extra["tags"]["extra"] = extra["extra_args"]
+        extra["tags"].update(extra["extra_kwargs"])
         return extra
 
     def debug(self, msg, *args, icontext: str | None = None, **kwargs):
