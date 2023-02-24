@@ -23,11 +23,12 @@ class Doovla(Configurable, WithLogging, IApi):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.baseurl = self.app_config.get("dvla_api_endpoint")
+        self.headers["user-agent"] = "rpc.dvla-tg/0.9"
         self.headers["x-api-key"] = self.app_config.get("dvla_apikey")
 
     @throws(InvalidInputError, InternalOperationalError)
     @validator(lambda x: v_regnum.match(x) is not None)
-    def lookup(self, reg: str) -> DVLAVehicle | str:
+    def lookup(self, reg: str) -> DVLAVehicle | DVLAError:
         try:
             resp = self.post(
                 "vehicle-enquiry/v1/vehicles",

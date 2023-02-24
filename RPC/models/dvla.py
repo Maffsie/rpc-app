@@ -335,6 +335,9 @@ class DVLAError:
         self.reason = self._j["errors"][0]["title"]
         self.detail = self._j["errors"][0]["detail"]
 
+    def as_view(self):
+        return str(self)
+
     def __str__(self):
         if not self.minor:
             return f"{self.reason} ({self.major})"

@@ -4,7 +4,7 @@ from flask import request, send_file
 
 from RPC.helper import throws
 from RPC.models.telegram import TelegramInlineRequest
-from RPC.roots import Api
+from RPC.roots import Api, RPCRequest
 from RPC.util.errors import (
     DishonourableError,
     InternalOperationalError,
@@ -13,6 +13,7 @@ from RPC.util.errors import (
 )
 from RPC.util.graphics import inline_render_chad, inline_render_rdj
 
+request: RPCRequest
 routes = Api()
 
 
@@ -68,9 +69,19 @@ def inline_req():
     ]
     - cache_time: int = 86400
     """
+    request.log.info("inline memes", step="begin")
     req: TelegramInlineRequest
     try:
         req = TelegramInlineRequest(request)
+        request.log.info(
+            "inline memes",
+            step="parsed",
+            requestor_id=req.from_id,
+            requestor_uname=req.from_uname,
+            requestor_bot=req.from_bot,
+            inline_id=req.inline_id,
+            honour=req.honour_request,
+        )
     except Exception as e:
         raise InternalOperationalError(f"something went wrong: {e}")
     if not req.honour_request:
@@ -81,6 +92,15 @@ def inline_req():
     req.append_response(
         *inline_render_rdj(impose=req.content, inline_id=req.inline_id, suffix=1)
     )
+    request.log.info(
+        "inline memes",
+        step="end",
+        requestor_id=req.from_id,
+        requestor_uname=req.from_uname,
+        requestor_bot=req.from_bot,
+        inline_id=req.inline_id,
+        responses=len(req.responses),
+    )
     return req.jdict
 
 
@@ -88,8 +108,10 @@ def inline_req():
 @throws(InvalidInputError, MissingFileError)
 def fetch_thumb(inline_id: int, suffix: int):
     fpath = Path(f"/tmp/r_{inline_id}.{suffix}_t.jpg")
+    request.log.info("get thumb", step="begin", inline_id=inline_id, suffix=suffix)
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered thumbnail could not be found.")
+    request.log.info("get thumb", step="end", inline_id=inline_id, suffix=suffix)
     return send_file(fpath)
 
 
@@ -97,6 +119,8 @@ def fetch_thumb(inline_id: int, suffix: int):
 @throws(InvalidInputError, MissingFileError)
 def fetch_render(inline_id: int, suffix: int):
     fpath = Path(f"/tmp/r_{inline_id}.{suffix}.jpg")
+    request.log.info("get render", step="begin", inline_id=inline_id, suffix=suffix)
     if not (fpath.exists() and fpath.is_file()):
         raise MissingFileError("Rendered image could not be found.")
+    request.log.info("get render", step="end", inline_id=inline_id, suffix=suffix)
     return send_file(fpath)

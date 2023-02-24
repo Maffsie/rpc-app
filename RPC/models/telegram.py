@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from flask import Request
 
+from RPC.roots import RPCRequest
 from RPC.util.coercion import coerce_type
 
 
@@ -25,7 +26,7 @@ class TelegramInlineRequest:
 
     responses: list
 
-    def __init__(self, request: Request):
+    def __init__(self, request: RPCRequest | Request):
         reqj = request.json
         self.inline_id = reqj["inlineQueryId"]
         self.chat_id = coerce_type(reqj.get("chatId", None), int)
