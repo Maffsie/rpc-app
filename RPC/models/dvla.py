@@ -583,7 +583,8 @@ class DVLAVehicle:
     def str_mot(self) -> str:
         return (
             f"Vehicle MOT {'is valid until' if self.moted else 'expired on'} "
-            f"{self.mot_until_year}/{self.mot_until_month}/{self.mot_until_day}."
+            f"{self.mot_until_year}/{self.mot_until_month}/{self.mot_until_day}.\n"
+            f"In-depth MOT information [may be available online](https://www.check-mot.service.gov.uk/results?registration={self.number})"
         )
 
     @property
