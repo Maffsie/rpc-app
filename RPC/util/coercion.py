@@ -86,14 +86,23 @@ def coerce_type(have: Any, want: T, need: bool = False) -> T:
                     return want[have]
                 except KeyError:
                     # Hail Mary - case-insensitively search for an enum member which has either a
-                    #  matching name or value
+                    #  matching name or value, both with and without spaces
                     for name in want._member_map_.keys():
                         if name.upper() == str(have).upper():
+                            return want[name]
+                    for name in want._member_map_.keys():
+                        if name.upper() == str(have).upper().replace(" ", "_"):
                             return want[name]
                     for member in want:
                         if member.name.upper() == str(have).upper():
                             return want[member.name]
+                        if member.name.upper() == str(have).upper().replace(" ", "_"):
+                            return want[member.name]
                         if str(member.value).upper() == str(have).upper():
+                            return want(member.value)
+                        if str(member.value).upper() == str(have).upper().replace(
+                            " ", "_"
+                        ):
                             return want(member.value)
                     # If we reach this point, there is no possibility of automatically turning `O`
                     #  into a member of the given Enum.
