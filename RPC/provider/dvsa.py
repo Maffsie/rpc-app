@@ -12,11 +12,11 @@ v_regnum = compile("^[a-zA-Z0-9]+$")
 
 class Doovsa(Configurable, WithLogging, IApi):
     app_config = {
-        "dvsa_apikey": str,
+        "dvsa_api_key": str,
         "dvsa_api_endpoint": "https://beta.check-mot.service.gov.uk",
     }
     errnos = {
-        "DVSA_APIKEY": "FDVSAAK",
+        "DVSA_API_KEY": "FDVSAAK",
     }
     errdes = {"FDVSAAK": "No API key present for the DVSA!"}
 
@@ -24,7 +24,7 @@ class Doovsa(Configurable, WithLogging, IApi):
         super().__init__(*args, **kwargs)
         self.baseurl = self.app_config.get("dvsa_api_endpoint")
         self.headers["user-agent"] = "rpc.dvsa-tg/0.9"
-        self.headers["x-api-key"] = self.app_config.get("dvsa_apikey")
+        self.headers["x-api-key"] = self.app_config.get("dvsa_api_key")
 
     @throws(InvalidInputError, InternalOperationalError)
     @validator(lambda x: v_regnum.match(x) is not None)

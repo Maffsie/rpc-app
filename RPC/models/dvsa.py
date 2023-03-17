@@ -4,7 +4,7 @@ from requests import Response
 
 from RPC.util.coercion import coerce_type
 
-from .dvla import FuelType, acronym_mfrs, months
+from .dvla import FuelType, acronym_mfrs
 
 
 class DVSAError:
@@ -19,13 +19,13 @@ class DVSAError:
         match resp.status_code:
             case 403:
                 self.reason = (
-                    "Unable to look up registration number due to an API error. The DVLA responded "
+                    "Unable to look up registration number due to an API error. The DVSA responded "
                     "Forbidden, which is not a temporary problem. Please contact @Maffsie."
                 )
                 return
             case 404:
                 self.reason = (
-                    "Registration number is in a valid format, but was not recognised by the DVLA. "
+                    "Registration number is in a valid format, but was not recognised by the DVSA. "
                     "If you know this to be a previously valid and registered registration number, "
                     "the vehicle may have been scrapped, or the number may have been removed from "
                     "a specific vehicle."
