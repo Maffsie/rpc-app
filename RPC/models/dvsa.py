@@ -52,13 +52,13 @@ class DVSAError:
 
 
 class MOTResult(Enum):
-    Passed = auto()
-    Failed = auto()
+    Passed = "pass"
+    Failed = "fail"
 
 
 class OdometerUnit(Enum):
-    mi = "Miles"
-    km = "Kilometers"
+    mi = "Mile"
+    km = "Kilometer"
 
 
 class MOTHistoryCommentType(Enum):
@@ -76,8 +76,12 @@ class MOTHistoryComment:
         self.ctype = coerce_type(comment["type"], MOTHistoryCommentType)
 
     @property
-    def str(self):
-        return f"{self.ctype.value} - {self.comment}"
+    def str(self) -> str:
+        return f"*{self.ctype.value}* - {self.comment}"
+
+    @property
+    def str_bullet(self) -> str:
+        return f"- {self.str}\n"
 
 
 class MOTHistoryEntry:
@@ -133,17 +137,53 @@ class MOTHistoryEntry:
         self.test_num = coerce_type(entry["motTestNumber"], int)
         self.odometer_val = coerce_type(entry["odometerValue"], int)
         self.odometer_unit = coerce_type(entry["odometerUnit"], OdometerUnit)
-        self.comments = [
-            MOTHistoryComment(comment) for comment in entry["rfrAndComments"]
-        ]
+        self.comments = []
+        if entry.get("rfrAndComments", None) is not None:
+            self.comments = [
+                MOTHistoryComment(comment) for comment in entry["rfrAndComments"]
+            ]
+
+    @property
+    def str(self) -> str:
+        return (
+            f"MOT #*{self.test_num}* was conducted on "
+            f"*{self.dt_completed_year}/{self.dt_completed_month:02d}/"
+            f"{self.dt_completed_day:02d}*"
+            f" at *{self.dt_completed_hour:02d}:{self.dt_completed_minute:02d}:"
+            f"{self.dt_completed_second:02d}*."
+            f"\nIt *{self.result.name.lower()}*{self.str_passed_expiry}.\n"
+            f"At time of test, the odometer was recorded as *{self.odometer_val} "
+            f"{self.odometer_unit.value.lower()}{'s' if self.odometer_val != 1 else ''}*.\n\n"
+            f"{self.str_comments}"
+        )
+
+    @property
+    def str_passed_expiry(self) -> str:
+        if self.result is MOTResult.Failed:
+            return ""
+        return (
+            f", and will require a new MOT to be performed before *{self.dt_expiry_year}/"
+            f"{self.dt_expiry_month:02d}/{self.dt_expiry_day:02d}*"
+        )
+
+    @property
+    def str_comments(self) -> str:
+        if len(self.comments) == 0:
+            return "There were no notes included with this MOT result."
+        return (
+            "The following notes were included during the testing process:\n"
+            f"{[comment.str_bullet for comment in self.comments]}"
+        )
 
 
 class DVSAVehicle:
     number: str = None
     manufacturer: str = None
     model: str = None
+    year: int = None
     colour: str = None
     fuel: FuelType = None
+    dvla_id: int = None
     dt_firstused: str = None
     dt_firstused_year: int = None
     dt_firstused_month: int = None
@@ -152,112 +192,72 @@ class DVSAVehicle:
     dt_firstmot_year: int = None
     dt_firstmot_month: int = None
     dt_firstmot_day: int = None
+    tests: list[MOTHistoryEntry] = None
 
-    def __init__(self, bjss_response):
-        self.number = bjss_response["registrationNumber"].upper()
-        self.manufacturer = bjss_response["make"].capitalize()
+    def __init__(self, bjss_response: dict):
+        self.manufacturer = bjss_response.get("make", "[Unknown make]").capitalize()
         if self.manufacturer.upper() in acronym_mfrs:
             self.manufacturer = self.manufacturer.upper()
-        self.colour = ves_response["colour"].lower()
-        self.year = coerce_type(ves_response["yearOfManufacture"], int)
+        self.model = bjss_response.get("model", "[Unknown model]")
+        self.fuel = coerce_type(bjss_response.get("fuelType", None), FuelType)
+        self.year = coerce_type(bjss_response.get("manufactureYear", None), int)
+        self.colour = bjss_response.get("primaryColour", None)
+        self.dvla_id = coerce_type(bjss_response.get("dvlaId", None), int)
+        self.number = bjss_response.get("registration", None)
 
-        self.layout = ves_response["wheelplan"].lower()
+        self.dt_firstused = bjss_response.get("firstUsedDate", None)
+        self.dt_firstmot = bjss_response.get("motTestExpiryDate", None)
 
-        self.fuel = coerce_type(ves_response.get("fuelType", None), FuelType)
-        self.capacity = coerce_type(ves_response.get("engineCapacity", None), int)
-        self.weight_rev = coerce_type(ves_response.get("revenueWeight", None), int)
-        self.autonomous = coerce_type(ves_response.get("automatedVehicle", None), bool)
+        # if the DVSA ever decide to change the format of this, we're fucked
+        if self.dt_firstused is not None:
+            sep = self.dt_firstused[4]
+            (
+                self.dt_firstused_year,
+                self.dt_firstused_month,
+                self.dt_firstused_day,
+            ) = self.dt_firstused.split(sep)
+            self.dt_firstused_year = coerce_type(self.dt_firstused_year, int)
+            self.dt_firstused_month = coerce_type(self.dt_firstused_month, int)
+            self.dt_firstused_day = coerce_type(self.dt_firstused_day, int)
 
-        self.emissions = coerce_type(ves_response.get("co2Emissions", None), int)
-        self.emissions_real = coerce_type(
-            ves_response.get("realDrivingEmissions", None), int
-        )
-        self.euro = coerce_type(ves_response.get("euroStatus", None), EuroStatus)
-        self.type_app = ves_response.get("typeApproval", "").upper()
-        self.type_app_d = coerce_type(self.type_app, IVATypeApproval)
+        if self.dt_firstmot is not None:
+            sep = self.dt_firstmot[4]
+            (
+                self.dt_firstmot_year,
+                self.dt_firstmot_month,
+                self.dt_firstmot_day,
+            ) = self.dt_firstmot.split(sep)
+            self.dt_firstmot_year = coerce_type(self.dt_firstmot_year, int)
+            self.dt_firstmot_month = coerce_type(self.dt_firstmot_month, int)
+            self.dt_firstmot_day = coerce_type(self.dt_firstmot_day, int)
 
-        if ves_response.get("monthOfFirstRegistration", None) is not None:
-            self.reg_year = coerce_type(
-                ves_response["monthOfFirstRegistration"].split("-")[0], int
-            )
-            self.reg_month = coerce_type(
-                ves_response["monthOfFirstRegistration"].split("-")[1], int
-            )
-        self.dvla_reg = ves_response.get("monthOfFirstDvlaRegistration", None)
-        if self.dvla_reg is not None:
-            self.dvla_reg_year = coerce_type(
-                ves_response["monthOfFirstDvlaRegistration"].split("-")[0], int
-            )
-            self.dvla_reg_month = coerce_type(
-                ves_response["monthOfFirstDvlaRegistration"].split("-")[1], int
-            )
-        self.exportable = coerce_type(ves_response.get("markedForExport", None), bool)
-
-        self.vfivec = ves_response.get("dateOfLastV5CIssued", None)
-        if self.vfivec is not None:
-            self.vfivec_year = coerce_type(
-                ves_response["dateOfLastV5CIssued"].split("-")[0], int
-            )
-            self.vfivec_month = coerce_type(
-                ves_response["dateOfLastV5CIssued"].split("-")[1], int
-            )
-            self.vfivec_day = coerce_type(
-                ves_response["dateOfLastV5CIssued"].split("-")[2], int
-            )
-
-        self.taxed = coerce_type(ves_response.get("taxStatus", None), bool)
-        if self.taxed is not None and ves_response.get("taxDueDate", None) is not None:
-            self.tax_due_year = coerce_type(
-                ves_response["taxDueDate"].split("-")[0], int
-            )
-            self.tax_due_month = coerce_type(
-                ves_response["taxDueDate"].split("-")[1], int
-            )
-            self.tax_due_day = coerce_type(
-                ves_response["taxDueDate"].split("-")[2], int
-            )
-        self.art_end_date = ves_response.get("artEndDate", None)
-
-        self.moted = coerce_type(ves_response.get("motStatus", None), bool)
-        if (
-            self.moted is not None
-            and ves_response.get("motExpiryDate", None) is not None
-        ):
-            self.mot_until_year = coerce_type(
-                ves_response["motExpiryDate"].split("-")[0], int
-            )
-            self.mot_until_month = coerce_type(
-                ves_response["motExpiryDate"].split("-")[1], int
-            )
-            self.mot_until_day = coerce_type(
-                ves_response["motExpiryDate"].split("-")[2], int
-            )
+        self.tests = []
+        if bjss_response.get("motTests", None) is not None:
+            self.tests = [MOTHistoryEntry(entry) for entry in bjss_response["motTests"]]
 
     @property
-    def str_full(self) -> str:
+    def str_full(self):
         return (
             "*Basic information*\n"
-            f"Vehicle with registration number *{self.number}* is a *{self.colour} {self.year} "
-            f"{self.manufacturer}*, whose wheel layout is *{self.layout}*.\n"
-            f"It has {self.str_fuel} engine, and was registered during the month of "
-            f"{months[self.reg_month]}, {self.reg_year}{self.str_dvlareg}. "
-            f"It is {'' if self.exportable else 'not '}marked for export. {self.str_type}\n\n"
-            "*Tax and MOT*\n"
-            f"{self.str_tax}\n{self.str_mot}\n{self.str_vfivec}\n\n"
-            "*Emissions & classification*\n"
-            f"{self.str_euro_and_emissions}."
+            f"Vehicle with registration number *{self.number}* is a *{self.str_clryr} "
+            f"{self.manufacturer} {self.model.capitalize()}*.\n\n"
+            "*MOT history*"
+            f"It has {self.str_fuel} engine{self.str_dvlaid}.\n"
+            f"{self.str_firstmot_or_used}.{self.str_recent_test}"
         )
 
     @property
-    def str_basic(self) -> str:
+    def str_clryr(self) -> str:
         return (
-            f"Vehicle with registration number {self.number} is a {self.colour} {self.year} "
-            f"{self.manufacturer}, whose wheel layout is {self.layout}. "
-            f"It consumes {self.fuel.name}. "
-            f"It was registered during the month of {months[self.reg_month]}, "
-            f"{self.reg_year}{self.str_dvlareg}. "
-            f"It is {'' if self.exportable else 'not '}marked for export. {self.str_euro}"
+            f"{self.colour + ' ' if self.colour is not None else ''}"
+            f"{str(self.year) + ' ' if self.year is not None else ''}"
         )
+
+    @property
+    def str_dvlaid(self) -> str:
+        if self.dvla_id is None:
+            return ""
+        return f", and is registered to the DVLA with ID *{self.dvla_id}*"
 
     @property
     def str_fuel(self) -> str:
@@ -266,103 +266,21 @@ class DVSAVehicle:
         return self.fuel
 
     @property
-    def str_dvlareg(self) -> str:
-        if not self.dvla_reg:
+    def str_firstmot_or_used(self) -> str:
+        if self.dt_firstmot is not None:
+            return (
+                f"This vehicle will be due its first MOT by *{self.dt_firstmot_year}/"
+                f"{self.dt_firstmot_month:02d}/{self.dt_firstmot_day:02d}*"
+            )
+        return (
+            f"This vehicle was first used on the road on *{self.dt_firstused_year}/"
+            f"{self.dt_firstused_month:02d}/{self.dt_firstused_day:02d}*, and has *"
+            f"{len(self.tests)}* logged test{'s' if len(self.tests) != 1 else ''}"
+            " in its MOT history"
+        )
+
+    @property
+    def str_recent_test(self) -> str:
+        if len(self.tests) == 0:
             return ""
-        return (
-            f" (and was first registered to the DVLA during the month of {months[self.dvla_reg_month]}"
-            f", {self.dvla_reg_year})"
-        )
-
-    @property
-    def str_euro(self) -> str:
-        if not self.euro:
-            return (
-                "The emissions of this vehicle have not been classified under the European "
-                "Emission Standards band rating, or its classification is not known to the DVLA"
-            )
-        return f"The emissions of this vehicle fall under the {self.euro.value} band."
-
-    @property
-    def str_type(self) -> str:
-        if not self.type_app:
-            return "Vehicle has no registered type approval."
-        return f"Vehicle has type approval {self.type_app}, which defines it as {self.type_app_d.value.lower()}."
-
-    @property
-    def str_euro_and_emissions(self) -> str:
-        if (
-            not self.emissions
-            and not self.capacity
-            and not self.emissions_real
-            and not self.euro
-        ):
-            return (
-                "The DVLA has no records or recorded European Emissions Standard band rating"
-                "for this vehicle."
-            )
-        if self.capacity and not self.emissions and not self.emissions_real:
-            return f"{self.str_emissions_capacity}. {self.str_euro}"
-        return f"{self.str_emissions} {self.str_euro}"
-
-    @property
-    def str_emissions(self) -> str:
-        if not self.emissions and not self.capacity and not self.emissions_real:
-            return "The DVLA has no records about the vehicle's engine capacity or emissions."
-        return f"{self.str_emissions_capacity}, {self.str_emissions_co}. {self.str_emissions_real}"
-
-    @property
-    def str_emissions_capacity(self) -> str:
-        if not self.capacity:
-            return "Vehicle doesn't have an engine, or its engine capacity is not known to the DVLA"
-        return f"Vehicle has an engine capacity of {self.capacity} cubic centimetres"
-
-    @property
-    def str_emissions_co(self) -> str:
-        if not self.emissions:
-            return "and produces no emissions, or the DVLA is not aware of its emissions rating"
-        return (
-            f"and produces emissions of {self.emissions}g of carbon dioxide (CO2) per "
-            f"kilometre driven"
-        )
-
-    @property
-    def str_emissions_real(self) -> str:
-        if not self.emissions_real:
-            return (
-                "Its real driving emissions, if different, are not known to the DVLA."
-            )
-        return f"It has real driving emissions of {self.emissions_real} grams per kilometre."
-
-    @property
-    def str_tax(self) -> str:
-        if self.taxed == "SORN":
-            return (
-                "Vehicle is registered for off-road use only, or is otherwise not able to use "
-                "normal roads, and has a SORN (Statutory off-road notice) registered against it."
-            )
-        return (
-            f"Vehicle is {'not ' if not self.taxed else ''}currently taxed. "
-            f"Tax expire{'s' if self.taxed else 'd'} on "
-            f"{self.tax_due_year}/{self.tax_due_month}/{self.tax_due_day}."
-            f"{'' if self.art_end_date is None else 'Additional tax rate ends on '+self.art_end_date}"
-        )
-
-    @property
-    def str_mot(self) -> str:
-        return (
-            f"Vehicle MOT {'is valid until' if self.moted else 'expired on'} "
-            f"{self.mot_until_year}/{self.mot_until_month}/{self.mot_until_day}.\n"
-            f"In-depth MOT information [may be available online](https://www.check-mot.service.gov.uk/results?registration={self.number})"
-        )
-
-    @property
-    def str_vfivec(self) -> str:
-        if not self.vfivec:
-            return (
-                "Vehicle does not have a logbook (V5C) or it is not known to the DVLA."
-            )
-        return (
-            f"Vehicle logbook (V5C) was last issued "
-            f"{self.vfivec_year}/{self.vfivec_month}/{self.vfivec_day}."
-        )
+        return f"*Most recent MOT result*\n\n{self.tests[0].str}"

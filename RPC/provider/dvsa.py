@@ -2,7 +2,7 @@ from json import JSONDecodeError
 from re import compile
 
 from RPC.helper import Configurable, WithLogging, throws, validator
-from RPC.models import DVLAError, DVLAVehicle
+from RPC.models import DVSAError, DVSAVehicle
 from RPC.roots import IApi
 from RPC.util.errors import InternalOperationalError, InvalidInputError
 
@@ -28,7 +28,7 @@ class Doovsa(Configurable, WithLogging, IApi):
 
     @throws(InvalidInputError, InternalOperationalError)
     @validator(lambda x: v_regnum.match(x) is not None)
-    def lookup_single(self, reg: str) -> DVLAVehicle | DVLAError:
+    def lookup_single(self, reg: str) -> DVSAVehicle | DVSAError:
         try:
             resp = self.get(
                 "trade/vehicles/mot-tests",
@@ -37,7 +37,7 @@ class Doovsa(Configurable, WithLogging, IApi):
                 },
             )
             if resp.status_code == 200:
-                return DVSAVehicle(resp.json())
+                return DVSAVehicle(resp.json()[0])
             return DVSAError(resp)
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)

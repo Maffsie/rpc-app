@@ -22,7 +22,7 @@ def reg_lookup(reg: str):
 @routes.get("/lookup_inline/<string:reg>")
 def reg_lookup_inline(reg: str):
     request.log.info("dvsa ves lookup", step="begin", registration=reg)
-    result = rpc.providers["dvsa"].lookup(reg)
+    result = rpc.providers["dvsa"].lookup_single(reg)
     request.log.info(
         "dvla ves lookup",
         step="end",
