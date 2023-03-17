@@ -108,22 +108,26 @@ class MOTHistoryEntry:
         self.result = coerce_type(entry["testResult"], MOTResult)
         self.dt_completed = entry["completedDate"]
         self.dt_completed_date, self.dt_completed_time = self.dt_completed.split(" ")
+        sep = self.dt_completed_date[4]
         (
             self.dt_completed_year,
             self.dt_completed_month,
             self.dt_completed_day,
-        ) = self.dt_completed_date.split(".")
+        ) = self.dt_completed_date.split(sep)
+        sep = self.dt_completed_time[2]
         (
             self.dt_completed_hour,
             self.dt_completed_minute,
             self.dt_completed_second,
-        ) = self.dt_completed_time.split(":")
-        self.dt_expiry = entry["expiryDate"]
-        (
-            self.dt_expiry_year,
-            self.dt_expiry_month,
-            self.dt_expiry_day,
-        ) = self.dt_expiry.split(".")
+        ) = self.dt_completed_time.split(sep)
+        if entry.get("expiryDate", None) is not None:
+            self.dt_expiry = entry["expiryDate"]
+            sep = self.dt_expiry[4]
+            (
+                self.dt_expiry_year,
+                self.dt_expiry_month,
+                self.dt_expiry_day,
+            ) = self.dt_expiry.split(sep)
 
         self.dt_completed_year = coerce_type(self.dt_completed_year, int)
         self.dt_completed_month = coerce_type(self.dt_completed_month, int)
