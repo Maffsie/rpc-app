@@ -81,7 +81,7 @@ class MOTHistoryComment:
 
     @property
     def str_bullet(self) -> str:
-        return f"- {self.str}\n"
+        return f"- {self.str}"
 
 
 class MOTHistoryEntry:
@@ -174,9 +174,9 @@ class MOTHistoryEntry:
     def str_comments(self) -> str:
         if len(self.comments) == 0:
             return "There were no notes included with this MOT result."
+        comments = "\n".join([comment.str_bullet for comment in self.comments])
         return (
-            "The following notes were included during the testing process:\n"
-            f"{[comment.str_bullet for comment in self.comments]}"
+            f"The following notes were included during the testing process:\n{comments}"
         )
 
 
@@ -243,9 +243,9 @@ class DVSAVehicle:
     def str_full(self):
         return (
             "*Basic information*\n"
-            f"Vehicle with registration number *{self.number}* is a *{self.str_clryr} "
+            f"Vehicle with registration number *{self.number}* is a *{self.str_clryr}"
             f"{self.manufacturer} {self.model.capitalize()}*.\n\n"
-            "*MOT history*"
+            "*MOT history*\n"
             f"It has {self.str_fuel} engine{self.str_dvlaid}.\n"
             f"{self.str_firstmot_or_used}.{self.str_recent_test}"
         )
@@ -287,4 +287,4 @@ class DVSAVehicle:
     def str_recent_test(self) -> str:
         if len(self.tests) == 0:
             return ""
-        return f"*Most recent MOT result*\n\n{self.tests[0].str}"
+        return f"\n\n*Most recent MOT result*\n\n{self.tests[0].str}"
