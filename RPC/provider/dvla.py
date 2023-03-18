@@ -7,7 +7,7 @@ from RPC.roots import IApi
 from RPC.util.errors import InternalOperationalError, InvalidInputError
 
 # apparently i am a fool
-v_regnum = compile("^[a-zA-Z0-9]+$")
+v_regnum = compile("^[a-zA-Z0-9]{1,7}$")
 
 
 class Doovla(Configurable, WithLogging, IApi):
