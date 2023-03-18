@@ -6,8 +6,7 @@ from RPC.models import DVSAError, DVSAVehicle
 from RPC.roots import IApi
 from RPC.util.errors import InternalOperationalError, InvalidInputError
 
-# apparently i am a fool
-v_regnum = compile("^[a-zA-Z0-9]+$")
+from .dvla import v_regnum
 
 
 class Doovsa(Configurable, WithLogging, IApi):
