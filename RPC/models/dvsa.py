@@ -47,8 +47,8 @@ class DVSAError:
 
     def __repr__(self):
         if not self.minor:
-            return f"<DVLAError {self.major}>"
-        return f"<DVLAError {self.major}.{self.minor} [{self.reason} [{self.detail}]]>"
+            return f"<DVSAError {self.major}>"
+        return f"<DVSAError {self.major}.{self.minor} [{self.reason} [{self.detail}]]>"
 
 
 class MOTResult(Enum):
@@ -64,6 +64,7 @@ class OdometerUnit(Enum):
 class MOTHistoryCommentType(Enum):
     User_Entered = "User-entered"
     Advisory = "Advisory note"
+    Minor = "Minor (non-failing fault)"
     Fail = "Failure"
 
 
@@ -287,4 +288,4 @@ class DVSAVehicle:
     def str_recent_test(self) -> str:
         if len(self.tests) == 0:
             return ""
-        return f"\n\n*Most recent MOT result*\n\n{self.tests[0].str}"
+        return f"\n\n*Most recent MOT result*\n{self.tests[0].str}"

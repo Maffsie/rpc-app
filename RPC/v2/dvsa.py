@@ -2,7 +2,7 @@ from flask import current_app as rpc
 from flask import request
 
 from RPC.helper.decorators import require_token
-from RPC.models import DVSAVehicle, RPCGrantType
+from RPC.models import DVSAError, DVSAVehicle, RPCGrantType
 from RPC.roots import Api, RPCRequest
 
 routes = Api()
@@ -31,4 +31,6 @@ def reg_lookup_inline(reg: str):
     )
     if isinstance(result, DVSAVehicle):
         return result.str_full, 200
+    if isinstance(result, DVSAError):
+        return result.as_view(), result.major
     return result, 404
