@@ -575,7 +575,7 @@ class DVLAVehicle:
         return (
             f"Vehicle is {'not ' if not self.taxed else ''}currently taxed. "
             f"Tax expire{'s' if self.taxed else 'd'} on "
-            f"{self.tax_due_year}/{self.tax_due_month}/{self.tax_due_day}."
+            f"{self.tax_due_year}/{self.tax_due_month:02d}/{self.tax_due_day:02d}."
             f"{'' if self.art_end_date is None else 'Additional tax rate ends on '+self.art_end_date}"
         )
 
@@ -583,8 +583,10 @@ class DVLAVehicle:
     def str_mot(self) -> str:
         return (
             f"Vehicle MOT {'is valid until' if self.moted else 'expired on'} "
-            f"{self.mot_until_year}/{self.mot_until_month}/{self.mot_until_day}.\n"
-            f"In-depth MOT information [may be available online](https://www.check-mot.service.gov.uk/results?registration={self.number})"
+            f"{self.mot_until_year}/{self.mot_until_month:02d}/{self.mot_until_day:02d}.\n"
+            "In-depth MOT information [may be available online]"
+            f"(https://www.check-mot.service.gov.uk/results?registration={self.number}) "
+            "(or by selecting the 'DVSA Trade' option when using this bot)"
         )
 
     @property
@@ -595,5 +597,5 @@ class DVLAVehicle:
             )
         return (
             f"Vehicle logbook (V5C) was last issued "
-            f"{self.vfivec_year}/{self.vfivec_month}/{self.vfivec_day}."
+            f"{self.vfivec_year}/{self.vfivec_month:02d}/{self.vfivec_day:02d}."
         )

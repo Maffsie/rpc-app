@@ -7,16 +7,16 @@ from RPC.roots import IApi
 from RPC.util.errors import InternalOperationalError, InvalidInputError
 
 # apparently i am a fool
-v_regnum = compile("^[a-zA-Z0-9]+$")
+v_regnum = compile("^[a-zA-Z0-9]{1,7}$")
 
 
 class Doovla(Configurable, WithLogging, IApi):
     app_config = {
-        "dvla_apikey": str,
+        "dvla_api_key": str,
         "dvla_api_endpoint": "https://driver-vehicle-licensing.api.gov.uk",
     }
     errnos = {
-        "DVLA_APIKEY": "FDVLAAK",
+        "DVLA_API_KEY": "FDVLAAK",
     }
     errdes = {"FDVLAAK": "No API key present for the DVLA!"}
 
@@ -24,7 +24,7 @@ class Doovla(Configurable, WithLogging, IApi):
         super().__init__(*args, **kwargs)
         self.baseurl = self.app_config.get("dvla_api_endpoint")
         self.headers["user-agent"] = "rpc.dvla-tg/0.9"
-        self.headers["x-api-key"] = self.app_config.get("dvla_apikey")
+        self.headers["x-api-key"] = self.app_config.get("dvla_api_key")
 
     @throws(InvalidInputError, InternalOperationalError)
     @validator(lambda x: v_regnum.match(x) is not None)
