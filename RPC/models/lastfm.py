@@ -13,15 +13,17 @@ class ASRecentPlays:
 
     def __init__(self, data: Response):
         if not isinstance(data, Response):
-            raise InvalidInputError(f"Input is not a Response object, but is instead: {type(data)}")
+            raise InvalidInputError(
+                f"Input is not a Response object, but is instead: {type(data)}"
+            )
         if data.status_code not in (200,):
-            raise InternalOperationalError(f"HTTP status {data.status_code} from last.fm!")
+            raise InternalOperationalError(
+                f"HTTP status {data.status_code} from last.fm!"
+            )
         jsn = data.json()["recenttracks"]
         self.total = coerce_type(jsn["@attr"]["total"], int)
         self.user = jsn["@attr"]["user"]
         self.data = jsn["tracks"]
-
-
 
 
 class ASTrack:

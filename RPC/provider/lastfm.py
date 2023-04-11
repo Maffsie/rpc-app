@@ -28,25 +28,33 @@ class AudioScrobble(Configurable, WithLogging, IApi):
         return super().request(method, url, *args, **kwargs)
 
     def read(self, method, **kwargs):
-        return self.request("GET", params={
-            "method": method,
-            "format": "json",
-            "api_key": self.app_config.get("lastfm_api_key"),
-            **kwargs
-        })
+        return self.request(
+            "GET",
+            params={
+                "method": method,
+                "format": "json",
+                "api_key": self.app_config.get("lastfm_api_key"),
+                **kwargs,
+            },
+        )
 
     def write(self, method, **kwargs) -> Response:
-        return self.request("POST", data={
-            "method": method,
-            "format": "json",
-            "api_key": self.app_config.get("lastfm_api_key"),
-            **kwargs
-        })
+        return self.request(
+            "POST",
+            data={
+                "method": method,
+                "format": "json",
+                "api_key": self.app_config.get("lastfm_api_key"),
+                **kwargs,
+            },
+        )
 
     @throws(InvalidInputError, InternalOperationalError)
     def recent_scrobbles(self, user: str) -> ASRecentPlays:
         try:
-            return ASRecentPlays(self.read(method="user.getrecenttracks", user=user, extended=1))
+            return ASRecentPlays(
+                self.read(method="user.getrecenttracks", user=user, extended=1)
+            )
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)
 
