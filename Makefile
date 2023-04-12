@@ -44,7 +44,7 @@ EXPOSE_PORT ?= 8069
 #code-running
 .PHONY: flask-run gunicorn-run
 #code-debugging
-.PHONY: flask-debug
+.PHONY: flask-debug repl
 #operational checks
 .PHONY: healthcheck
 #container-only
@@ -144,6 +144,10 @@ flask-run: requirements $(RESTGTS) banner
 # Starts the Flask development server in debug mode
 flask-debug: requirements $(RESTGTS) banner
 	pipenv run flask --debug -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
+
+# Opens a REPL
+repl: requirements $(RESTGTS)
+	pipenv run python
 
 # Starts the gunicorn production server
 #  Does not depend on requirements, because this would be run in a packaged scenario
