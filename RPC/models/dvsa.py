@@ -56,6 +56,15 @@ class MOTResult(Enum):
     Failed = "fail"
 
 
+class DVSAType(Enum):
+    HGV = "Heavy Goods Vehicle"
+    PSV = "Passenger Service Vehicle"
+
+
+class DVSATestType(Enum):
+    aal = "Annual test"
+
+
 class OdometerUnit(Enum):
     mi = "Mile"
     km = "Kilometer"
@@ -181,6 +190,30 @@ class MOTHistoryEntry:
         )
 
 
+class AnnualTest:
+    performed_year: int
+    performed_month: int
+    performed_day: int
+    test_type: DVSATestType
+    result: MOTResult
+    cert_num: str
+    expiry_year: int
+    expiry_month: int
+    expiry_day: int
+    defects: int
+    advisories: int
+
+    def __init__(self, testdata: dict):
+        self.result = coerce_type(testdata['testResult'], MOTResult)
+        self.test_type = coerce_type(testdata['testType'], DVSATestType)
+        self.cert_num = testdata.get('testCertificateNumber', None)
+        self.performed_year, self.performed_month, self.performed_day = testdata['testDate'].split('.')
+        if self.cert_num is not None:
+            self.expiry_year, self.expiry_month, self.expiry_day = testdata['expiryDate'].split('.')
+        self.defects = coerce_type(testdata['numberOfDefectsAtTest'], int)
+        self.advisories = coerce_type(testdata['numberOfAdvisoryDefectsAtTest'], int)
+
+
 class DVSAVehicle:
     number: str = None
     manufacturer: str = None
@@ -293,3 +326,20 @@ class DVSAVehicle:
         if len(self.tests) == 0:
             return ""
         return f"\n\n*Most recent MOT result*\n{self.tests[0].str}"
+
+class DVSAVehicleAnnual:
+    number: str
+    make: str
+    model: str
+    type: DVSAType
+    reg_year: int
+    reg_month: int
+    reg_day: int
+    expiry_year: int
+    expiry_month: int
+    expiry_day: int
+    tests: list[AnnualTest]
+
+    def __init__(self, historydata: dict):
+        self.number = historydata['registration']
+

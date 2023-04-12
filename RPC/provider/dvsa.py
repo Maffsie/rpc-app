@@ -41,5 +41,20 @@ class Doovsa(Configurable, WithLogging, IApi):
         except JSONDecodeError as e:
             raise InternalOperationalError(e.msg)
 
+    @validator(lambda x: v_regnum.match(x) is not None)
+    def lookup_annual(self, reg: str) -> DVSAAnnualVehicle | DVSAError:
+        try:
+            resp = self.get(
+                "trade/vehicles/annual-tests",
+                params={
+                    "registrations": reg,
+                },
+            )
+            if resp.status_code == 200:
+                return DVSAVehicle(resp.json()[0])
+            return DVSAError(resp)
+        except JSONDecodeError as e:
+            raise InternalOperationalError(e.msg)
+
 
 p_cls = Doovsa
