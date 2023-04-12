@@ -200,10 +200,14 @@ class DVSAVehicle:
     tests: list[MOTHistoryEntry] = None
 
     def __init__(self, bjss_response: dict):
-        self.manufacturer = bjss_response.get("make", "[Unknown make]").capitalize()
+        self.manufacturer = bjss_response.get("make", "Unknown").capitalize()
         if self.manufacturer.upper() in acronym_mfrs:
-            self.manufacturer = self.manufacturer.upper()
-        self.model = bjss_response.get("model", "[Unknown model]")
+            self.manufacturer = acronym_mfrs.get(self.manufacturer.upper())
+        elif self.manufacturer == "Unknown":
+            self.manufacturer = "[DVSA does not have the manufacturer on file]"
+        self.model = bjss_response.get("model", "Unknown")
+        if self.model == "Unknown":
+            self.model = "[DVSA does not have the model on file]"
         self.fuel = coerce_type(bjss_response.get("fuelType", None), FuelType)
         self.year = coerce_type(bjss_response.get("manufactureYear", None), int)
         self.colour = bjss_response.get("primaryColour", None)

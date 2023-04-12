@@ -581,6 +581,13 @@ class DVLAVehicle:
 
     @property
     def str_mot(self) -> str:
+        if self.mot_until_year is None:
+            return (
+                "MOT information for this vehicle is not held by the DVLA.\n"
+                "MOT information [may be available online]"
+                f"(https://www.check-mot.service.gov.uk/results?registration={self.number})"
+                " from the DVSA (or by selecting the 'DVSA Trade' option when using this bot)"
+            )
         return (
             f"Vehicle MOT {'is valid until' if self.moted else 'expired on'} "
             f"{self.mot_until_year}/{self.mot_until_month:02d}/{self.mot_until_day:02d}.\n"
