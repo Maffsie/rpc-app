@@ -6,6 +6,44 @@ from RPC.util.coercion import coerce_type
 from RPC.util.errors import InternalOperationalError, InvalidInputError
 
 
+class HasMBID:
+    mbid: str
+
+    def __init__(self, json_payload: dict):
+        self.mbid = json_payload.get('mbid')
+        super().__init__(json_payload)
+
+
+class ASArtist(HasMBID):
+    name: str
+
+    def __init__(self, json_payload: dict):
+        super().__init__(json_payload)
+        self.name = json_payload.get('#text')
+
+
+class ASRelease(HasMBID):
+    name: str
+
+    def __init__(self, json_payload: dict):
+        super().__init__(json_payload)
+        self.name = json_payload.get('#text')
+
+
+class ASTrack(HasMBID):
+    title: str
+    artist: ASArtist
+    album: ASRelease
+    loved: bool
+
+    def __init__(self, json_payload: dict):
+        super().__init__(json_payload)
+        self.title = json_payload.get('name')
+        self.artist = ASArtist(json_payload.get('artist'))
+        self.album = ASRelease(json_payload.get('album'))
+        self.loved = coerce_type(json_payload.get('loved', 0), bool)
+
+
 class ASRecentPlays:
     data: dict
     total: int
@@ -23,8 +61,4 @@ class ASRecentPlays:
         jsn = data.json()["recenttracks"]
         self.total = coerce_type(jsn["@attr"]["total"], int)
         self.user = jsn["@attr"]["user"]
-        self.data = jsn["tracks"]
-
-
-class ASTrack:
-    pass
+        self.data = jsn["track"]
