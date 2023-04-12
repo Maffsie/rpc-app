@@ -204,14 +204,18 @@ class AnnualTest:
     advisories: int
 
     def __init__(self, testdata: dict):
-        self.result = coerce_type(testdata['testResult'], MOTResult)
-        self.test_type = coerce_type(testdata['testType'], DVSATestType)
-        self.cert_num = testdata.get('testCertificateNumber', None)
-        self.performed_year, self.performed_month, self.performed_day = testdata['testDate'].split('.')
+        self.result = coerce_type(testdata["testResult"], MOTResult)
+        self.test_type = coerce_type(testdata["testType"], DVSATestType)
+        self.cert_num = testdata.get("testCertificateNumber", None)
+        self.performed_year, self.performed_month, self.performed_day = testdata[
+            "testDate"
+        ].split(".")
         if self.cert_num is not None:
-            self.expiry_year, self.expiry_month, self.expiry_day = testdata['expiryDate'].split('.')
-        self.defects = coerce_type(testdata['numberOfDefectsAtTest'], int)
-        self.advisories = coerce_type(testdata['numberOfAdvisoryDefectsAtTest'], int)
+            self.expiry_year, self.expiry_month, self.expiry_day = testdata[
+                "expiryDate"
+            ].split(".")
+        self.defects = coerce_type(testdata["numberOfDefectsAtTest"], int)
+        self.advisories = coerce_type(testdata["numberOfAdvisoryDefectsAtTest"], int)
 
 
 class DVSAVehicle:
@@ -326,6 +330,7 @@ class DVSAVehicle:
         if len(self.tests) == 0:
             return ""
         return f"\n\n*Most recent MOT result*\n{self.tests[0].str}"
+
 
 class DVSAVehicleAnnual:
     number: str
