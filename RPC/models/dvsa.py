@@ -56,7 +56,7 @@ class MOTResult(Enum):
     Failed = "fail"
 
 
-class DVSAType(Enum):
+class DVSAVehicleType(Enum):
     HGV = "Heavy Goods Vehicle"
     PSV = "Passenger Service Vehicle"
 
@@ -334,17 +334,38 @@ class DVSAVehicle:
 
 class DVSAVehicleAnnual:
     number: str
-    make: str
+    manufacturer: str
     model: str
-    type: DVSAType
+    type: DVSAVehicleType
+    reg: str
     reg_year: int
     reg_month: int
     reg_day: int
+    expiry: str
     expiry_year: int
     expiry_month: int
     expiry_day: int
     tests: list[AnnualTest]
 
     def __init__(self, historydata: dict):
-        self.number = historydata['registration']
+        self.number = historydata["registration"]
+        self.model = historydata.get("model", "Unknown")
+        self.manufacturer = historydata.get("make", "Unknown")
+        if self.manufacturer.upper() in acronym_mfrs:
+            self.manufacturer = acronym_mfrs.get(self.manufacturer.upper())
+        elif self.manufacturer == "Unknown":
+            self.manufacturer = "[DVSA does not have the manufacturer on file]"
+        if self.model == "Unknown":
+            self.model = "[DVSA does not have the model on file]"
+        self.reg = historydata.get("registrationDate", None)
+        self.expiry = historydata.get("expiryDate", None)
+        self.type = coerce_type(historydata.get("vehicleType", None), DVSAVehicleType)
+        self.tests = [AnnualTest(data) for data in historydata["annualTests"]]
+
+
+class DVSAVehiclesAnnual:
+    vehicles: list[DVSAVehicleAnnual]
+
+    def __init__(self, response: dict):
+        self.vehicles = [DVSAVehicleAnnual(data) for data in response]
 

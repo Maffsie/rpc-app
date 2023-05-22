@@ -1,9 +1,9 @@
-import logging
 import sqlite3
 
 from influxdb import InfluxDBClient
 
 from RPC.helper import load_conf_static
+from RPC.util.log import Logger
 
 
 class WithDBConf:
@@ -58,8 +58,8 @@ class WithLogging:
     Layer to provide logging for subclasses
     """
 
-    log: logging.Logger = None
+    log: Logger
 
     def __init__(self, *args, ctx: str | None = None, **kwargs):
-        self.log = logging.getLogger(name=ctx)
+        self.log = Logger(context=ctx)
         super().__init__(*args, **kwargs)

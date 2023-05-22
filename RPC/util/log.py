@@ -35,6 +35,7 @@ class Logger(Configurable):
 
     app_config = {
         "debug": False,
+        "flask_debug": False,
         "loki_url": str,
         "loki_port": 443,
     }
@@ -58,12 +59,21 @@ class Logger(Configurable):
         self.tags = {}
         self.cid = correlation_id if correlation_id is not None else uuid()
         super().__init__(*args, **kwargs)
+        if self.app_config["flask_debug"]:
+            debug = True
         if debug:
             self.app_config["debug"] = debug
 
         # Set up root logger
-        root_logger = logging.getLogger()
-        if LokiHandler not in [type(h) for h in root_logger.handlers]:
+        root_logger = logging.root
+        if self.app_config.get("flask_debug"):
+            if logging.StreamHandler not in [type(h) for h in root_logger.handlers]:
+                from sys import stdout
+                root_logger.addHandler(logging.StreamHandler(stdout))
+        # TODO: why does this need to be an elif?
+        #       changing to just an 'if' doesn't work and results in the loki handler
+        #       dumping to stdout while infinitely recursing
+        elif LokiHandler not in [type(h) for h in root_logger.handlers]:
             root_logger.setLevel("DEBUG" if self.app_config.get("debug") else "INFO")
             root_logger.addHandler(
                 LokiHandler(

@@ -383,8 +383,11 @@ class DVLAVehicle:
     autonomous: bool = None
     type_app: str = None
     type_app_d: str = None
+    resptmp = None
 
     def __init__(self, ves_response):
+        self.resptmp = ves_response
+
         self.number = ves_response["registrationNumber"].upper()
         self.manufacturer = ves_response["make"].capitalize()
         if self.manufacturer.upper() in acronym_mfrs:
