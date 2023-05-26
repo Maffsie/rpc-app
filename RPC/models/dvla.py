@@ -275,7 +275,9 @@ class FuelType(Enum):
 
     Diesel = "a Diesel"
     Electricity = "an Electric"
+    Electric = "an Electric"
     Hybrid = "a Hybrid Electric"
+    NotHeld = "not been registered with the DVLA as having any specific kind of "
     Petrol = "a Petrol"
     Steam = "a Steam"
 
@@ -397,7 +399,7 @@ class DVLAVehicle:
 
         self.layout = ves_response["wheelplan"].lower()
 
-        self.fuel = coerce_type(ves_response.get("fuelType", None), FuelType)
+        self.fuel = coerce_type(ves_response.get("fuelType", "NotHeld"), FuelType)
         self.capacity = coerce_type(ves_response.get("engineCapacity", None), int)
         self.weight_rev = coerce_type(ves_response.get("revenueWeight", None), int)
         self.autonomous = coerce_type(ves_response.get("automatedVehicle", None), bool)
@@ -450,6 +452,8 @@ class DVLAVehicle:
             self.tax_due_day = coerce_type(
                 ves_response["taxDueDate"].split("-")[2], int
             )
+        if ves_response.get("taxStatus", None) == "SORN":
+            self.taxed = "SORN"
         self.art_end_date = ves_response.get("artEndDate", None)
 
         self.moted = coerce_type(ves_response.get("motStatus", None), bool)
@@ -532,7 +536,7 @@ class DVLAVehicle:
             and not self.euro
         ):
             return (
-                "The DVLA has no records or recorded European Emissions Standard band rating"
+                "The DVLA has no records or recorded European Emissions Standard band rating "
                 "for this vehicle."
             )
         if self.capacity and not self.emissions and not self.emissions_real:

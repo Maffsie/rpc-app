@@ -68,12 +68,14 @@ class DVSATestType(Enum):
 class OdometerUnit(Enum):
     mi = "Mile"
     km = "Kilometer"
+    NoUnit = "(zero)"
 
 
 class MOTHistoryCommentType(Enum):
     User_Entered = "User-entered"
     Advisory = "Advisory note"
     Minor = "Minor (non-failing fault)"
+    PRS = "PRS (pass after rectification at station)"
     Fail = "Failure"
 
 
@@ -150,7 +152,7 @@ class MOTHistoryEntry:
         self.dt_expiry_day = coerce_type(self.dt_expiry_day, int)
         self.test_num = coerce_type(entry["motTestNumber"], int)
         self.odometer_val = coerce_type(entry["odometerValue"], int)
-        self.odometer_unit = coerce_type(entry["odometerUnit"], OdometerUnit)
+        self.odometer_unit = coerce_type(entry.get("odometerUnit", "NoUnit"), OdometerUnit)
         self.comments = []
         if entry.get("rfrAndComments", None) is not None:
             self.comments = [
@@ -167,7 +169,7 @@ class MOTHistoryEntry:
             f"{self.dt_completed_second:02d}*."
             f"\nIt *{self.result.name.lower()}*{self.str_passed_expiry}.\n"
             f"At time of test, the odometer was recorded as *{self.odometer_val} "
-            f"{self.odometer_unit.value.lower()}{'s' if self.odometer_val != 1 else ''}*.\n\n"
+            f"{self.odometer_unit.value.lower()}{'s' if self.odometer_val > 1 else ''}*.\n\n"
             f"{self.str_comments}"
         )
 
@@ -235,16 +237,25 @@ class DVSAVehicle:
     dt_firstmot_month: int = None
     dt_firstmot_day: int = None
     tests: list[MOTHistoryEntry] = None
+    resptmp: dict = None
 
     def __init__(self, bjss_response: dict):
+        self.resptmp = bjss_response
+
         self.manufacturer = bjss_response.get("make", "Unknown").capitalize()
-        if self.manufacturer.upper() in acronym_mfrs:
-            self.manufacturer = acronym_mfrs.get(self.manufacturer.upper())
-        elif self.manufacturer == "Unknown":
-            self.manufacturer = "[DVSA does not have the manufacturer on file]"
         self.model = bjss_response.get("model", "Unknown")
-        if self.model == "Unknown":
+        if bjss_response.get("makeInFull", None) is not None:
+            self.manufacturer, _, self.model = bjss_response.get("makeInFull", None).partition(" ")
+        if self.manufacturer.upper() in acronym_mfrs:
+            self.manufacturer = self.manufacturer.upper()
+        elif self.manufacturer.lower() == "unknown":
+            self.manufacturer = "[DVSA does not have the manufacturer on file]"
+        else:
+            self.manufacturer = self.manufacturer.capitalize()
+        if self.model.lower() == "unknown":
             self.model = "[DVSA does not have the model on file]"
+        else:
+            self.model = self.model.capitalize()
         self.fuel = coerce_type(bjss_response.get("fuelType", None), FuelType)
         self.year = coerce_type(bjss_response.get("manufactureYear", None), int)
         self.colour = bjss_response.get("primaryColour", None)
@@ -286,7 +297,7 @@ class DVSAVehicle:
         return (
             "*Basic information*\n"
             f"Vehicle with registration number *{self.number}* is a *{self.str_clryr}"
-            f"{self.manufacturer} {self.model.capitalize()}*.\n\n"
+            f"{self.manufacturer} {self.model}*.\n\n"
             "*MOT history*\n"
             f"It has {self.str_fuel} engine{self.str_dvlaid}.\n"
             f"{self.str_firstmot_or_used}.{self.str_recent_test}"
@@ -313,6 +324,11 @@ class DVSAVehicle:
 
     @property
     def str_firstmot_or_used(self) -> str:
+        if self.dt_firstused is None and self.dt_firstmot is None:
+            return (
+                "This vehicle does not have any prior MOTs, and no date set for a first MOT, "
+                "and may have been registered for regulatory testing purposes. "
+            )
         if self.dt_firstmot is not None:
             return (
                 f"This vehicle will be due its first MOT by *{self.dt_firstmot_year}/"
@@ -352,7 +368,7 @@ class DVSAVehicleAnnual:
         self.model = historydata.get("model", "Unknown")
         self.manufacturer = historydata.get("make", "Unknown")
         if self.manufacturer.upper() in acronym_mfrs:
-            self.manufacturer = acronym_mfrs.get(self.manufacturer.upper())
+            self.manufacturer = self.manufacturer.upper()
         elif self.manufacturer == "Unknown":
             self.manufacturer = "[DVSA does not have the manufacturer on file]"
         if self.model == "Unknown":
