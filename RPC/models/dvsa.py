@@ -86,10 +86,12 @@ class MOTHistoryComment:
     def __init__(self, comment: dict):
         self.comment = comment["text"]
         self.ctype = coerce_type(comment["type"], MOTHistoryCommentType)
+        if self.ctype is None:
+            self.ctype = comment["type"]
 
     @property
     def str(self) -> str:
-        return f"*{self.ctype.value}* - {self.comment}"
+        return f"*{self.ctype.value if isinstance(self.ctype, MOTHistoryCommentType) else self.ctype}* - {self.comment}"
 
     @property
     def str_bullet(self) -> str:
