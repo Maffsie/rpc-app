@@ -25,10 +25,12 @@ ARM64HOST ?= a64-p4-8-0.$(TSDOMAIN)
 I386USR ?= maff
 I386HOST ?= x40.$(TSDOMAIN)
 X64USR ?= root
-X64HOST ?= eu-fsn-hv3.$(TSDOMAIN)
+X64HOST ?= darkside.$(TSDOMAIN)
 SWARM_SVC := api_rpc
 
 EXPOSE_PORT ?= 8069
+
+CELERY_TARGET ?= processor
 
 # non-literal targets
 # organised by category
@@ -42,7 +44,7 @@ EXPOSE_PORT ?= 8069
 #code style, syntax and function validation
 .PHONY: format lint test ci-test
 #code-running
-.PHONY: flask-run gunicorn-run
+.PHONY: celery-run flask-run gunicorn-run
 #code-debugging
 .PHONY: flask-debug repl
 #operational checks
@@ -144,6 +146,10 @@ flask-run: requirements $(RESTGTS) banner
 # Starts the Flask development server in debug mode
 flask-debug: requirements $(RESTGTS) banner
 	pipenv run flask --debug -A $(SRCPATH) run -h 0.0.0.0 -p $(EXPOSE_PORT) $(ARGS)
+
+# Starts the Celery local worker
+celery-run: requirements $(RESTGTS) banner
+	pipenv run celery -A $(SRCPATH).$(CELERY_TARGET) worker $(ARGS)
 
 # Opens a REPL
 repl: requirements $(RESTGTS)

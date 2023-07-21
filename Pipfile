@@ -11,6 +11,8 @@ pydantic = "*"
 python-dotenv = "*"
 python-logging-loki = "*"
 requests = "*"
+# processor
+celery = {extras = ["redis"], version = "*"}
 # provider.Tailzone
 python-digitalocean = "*"
 tailscale = "*"

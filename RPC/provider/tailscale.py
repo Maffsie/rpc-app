@@ -3,7 +3,13 @@ from asyncio import run as wait
 from digitalocean import Domain as DOdomain
 from tailscale import Tailscale
 
+from flask import current_app as rpc
+
+from RPC import RPCApp
 from RPC.helper import Configurable
+from RPC.models import TailscaleHost
+
+rpc: RPCApp
 
 
 class Tailzone(Configurable):
@@ -16,7 +22,7 @@ class Tailzone(Configurable):
         "tailzone_do_record": "_tailzone_managed",
     }
 
-    async def get_devices(self):
+    async def get_devices(self) -> list[TailscaleHost]:
         network = Tailscale(
             api_key=self.app_config.get("tailscale_apikey"),
             tailnet=self.app_config.get("tailzone_ts_net"),
@@ -28,57 +34,30 @@ class Tailzone(Configurable):
         #       v4 addresses will always(?) start with 100., v6 will always(?) start with fd7a:
         devices = await network.devices()
         devices = [
-            {
-                "host": devices[device].name.split(".")[0].lower(),
-                "a4": devices[device].addresses[0],
-                "a6": devices[device].addresses[1],
-                "extern": devices[device].is_external,
-                "tags": devices[device].tags
-                if devices[device].tags is not None
-                else [],
-            }
+            TailscaleHost(hostname=devices[device].name.split(".")[0].lower(),
+                          extern=devices[device].is_external,
+                          _tags=devices[device].tags or [],
+                          _publish_tag=self.app_config.get("tailzone_ts_tag"),
+                          a4=devices[device].addresses[0],
+                          a6=devices[device].addresses[1])
             for device in devices
         ]
         await network.session.close()
         await network.close()
         return devices
 
-    def main(self, *args, **kwargs):
-        results = {
-            "mode": "periodic"
-            if not self.app_config.get("tailzone_destroy_all_managed_records", False)
-            else "destroy",
-            "poll_stats": {
-                "count_dns_records": 0,
-                "count_tailscale_devices": 0,
-                "count_existing_managed": 0,
-                "count_existing_orphaned": 0,
-                "count_existing_pending": 0,
-                "count_removable_managed": 0,
-            },
-            "outcomes": {
-                "created": {
-                    "a": 0,
-                    "aaaa": 0,
-                    "txt": 0,
-                },
-                "destroyed": {
-                    "a": 0,
-                    "aaaa": 0,
-                    "txt": 0,
-                },
-            },
-        }
-
+    def tailzone(self, *args, **kwargs):
+        rpc.log.info("tailzone start", step="begin")
         devices = wait(self.get_devices())
-        results["poll_stats"]["count_tailscale_devices"] = len(devices)
+        rpc.log.info("got device list", step="get_devices", device_count=len(devices))
 
         domain = DOdomain(
             token=self.app_config.get("digitalocean_apikey"),
             name=self.app_config.get("tailzone_do_domain"),
         )
         records = domain.get_records()
-        results["poll_stats"]["count_dns_records"] = len(records)
+        rpc.log.info("got DO domain records", step="get_records",
+                     record_count=len(records), domain=domain.name)
 
         # Collect all currently-managed records, if any
         # Managed records are stored by name in individual text records
@@ -89,94 +68,73 @@ class Tailzone(Configurable):
             if record.name == self.app_config.get("tailzone_do_record")
             and record.type == "TXT"
         ]
-        results["poll_stats"]["count_existing_managed"] = len(managed)
 
         pending = [
             host
             for host in devices
-            if f"tag:{self.app_config.get('tailzone_ts_tag')}" in host["tags"]
-            and host["host"] not in managed
+            if host.publish
+            and host.hostname not in managed
         ]
-        results["poll_stats"]["count_existing_pending"] = len(pending)
 
         removable = [
-            host["host"]
+            host.hostname
             for host in devices
-            if f"tag:{self.app_config.get('tailzone_ts_tag')}" not in host["tags"]
-            and host["host"] in managed
+            if host in managed
+            and not host.publish
         ]
-        results["poll_stats"]["count_removable_managed"] = len(removable)
 
         orphaned = [
-            name for name in managed if name not in [host["host"] for host in devices]
+            name
+            for name in managed
+            if name not in [
+                host.hostname
+                for host in devices
+            ]
         ]
-        results["poll_stats"]["count_existing_orphaned"] = len(orphaned)
+
+        rpc.log.info("sorted into lists", step="list_sort",
+                     managed=len(managed), pending=len(pending),
+                     removable=len(removable), orphaned=len(orphaned))
 
         if self.app_config.get("tailzone_destroy_all_managed_records", False):
             removable = [
-                *[host["host"] for host in pending],
+                *[host.hostname for host in pending],
                 *managed,
                 *removable,
             ]
             managed = []
             pending = []
+            rpc.log.warn("will destroy all tailzone-managed records", step="destroy",
+                         to_destroy=len(removable))
 
-        changeset = {
-            "destroy": [
-                {
-                    "name": record.name.lower(),
-                    "data": record.data.lower(),
-                    "type": record.type,
-                    "result": record.destroy(),
-                }
-                for record in records
-                if (
-                    record.name.lower() in [*orphaned, *removable]
-                    and record.type in ("A", "AAAA")
-                )
-                or (
-                    record.name == self.app_config.get("tailzone_do_record")
-                    and record.type == "TXT"
-                    and record.data.lower() in [*orphaned, *removable]
-                )
-            ],
-            "create_a": [
-                {
-                    "name": host["host"],
-                    "result": domain.create_new_domain_record(
-                        type="A", name=host["host"], data=host["a4"]
-                    ),
-                }
-                for host in pending
-            ],
-            "create_aaaa": [
-                {
-                    "name": host["host"],
-                    "result": domain.create_new_domain_record(
-                        type="AAAA", name=host["host"], data=host["a6"]
-                    ),
-                }
-                for host in pending
-            ],
-            "create_txt": [
-                {
-                    "name": host["host"],
-                    "result": domain.create_new_domain_record(
-                        type="TXT",
-                        name=self.app_config.get("tailzone_do_record"),
-                        data=host["host"],
-                    ),
-                }
-                for host in pending
-            ],
-        }
+        # To batch up creation and destruction in a single listcomp,
+        #  abuse tuples :)
+        destroyed = [
+            (record.name, record.destroy())[0]
+            for record in records
+            if (record.name.lower() in [*orphaned, *removable]
+                and record.type in ("A", "AAAA"))
+            or (record.type == "TXT"
+                and record.name == self.app_config.get("tailzone_do_record")
+                and record.data.lower() in [*orphaned, *removable])
+        ]
+        rpc.log.info("destroyed records", step="destroy_records",
+                     destroyed=len(destroyed))
+        created = [(
+            host.hostname,
+            domain.create_new_domain_record(
+                type="A", name=host.hostname, data=host.a4),
+            domain.create_new_domain_record(
+                type="AAAA", name=host.hostname, data=host.a6),
+            domain.create_new_domain_record(
+                type="TXT", name=self.app_config.get("tailzone_do_record"), data=host.hostname)
+            )[0]
+            for host in pending
+        ]
+        rpc.log.info("created records", step="create_records",
+                     created=len(created))
 
-        for rrtype in ("a", "aaaa", "txt"):
-            results["outcomes"]["created"][rrtype] = len(changeset[f"create_{rrtype}"])
-            results["outcomes"]["destroyed"][rrtype] = len(
-                [res for res in changeset["destroy"] if res["type"].lower() == rrtype]
-            )
-
+        rpc.log.info("tailzone finished", step="end", success=True)
         return
 
 

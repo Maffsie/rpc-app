@@ -52,7 +52,7 @@ def preconfigure(conf_file=search_files, conf_paths=search_paths):
             pass
 
 
-def load_conf_static(conf, errno, errdesc):
+def load_conf_static(conf, errno, errdesc) -> dict:
     """
     Load all configuration values from the execution environment if possible
     """
